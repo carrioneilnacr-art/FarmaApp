@@ -35,7 +35,8 @@
         {
           "cameraPermission": "Permite a FarmaApp usar la cámara para escanear códigos de barras de medicamentos."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "scheme": "farmaapp",
     "extra": {
