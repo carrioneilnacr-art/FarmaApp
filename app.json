@@ -24,7 +24,8 @@
       },
       "package": "com.botica.farmaapp",
       "permissions": [
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "plugins": [
@@ -36,6 +37,15 @@
         }
       ]
     ],
-    "scheme": "farmaapp"
+    "scheme": "farmaapp",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d798fad6-12b2-4d0d-9fb6-a95122171aee"
+      }
+    },
+    "owner": "neilmvp"
   }
 }
