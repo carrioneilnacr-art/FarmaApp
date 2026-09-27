@@ -21,10 +21,10 @@ El objetivo de la suite de pruebas es garantizar el correcto funcionamiento del 
 ================================================================================
                     RESULTADOS DE EJECUCIÓN DE PRUEBAS
 ================================================================================
- Test Suites: 4 passed, 4 total
- Tests:       42 passed, 42 total (100% éxito)
+ Test Suites: 6 passed, 6 total
+ Tests:       58 passed, 58 total (100% éxito)
  Snapshots:   0 total
- Time:        24.024 s
+ Time:        21.002 s
 ================================================================================
 ```
 
@@ -36,6 +36,8 @@ El objetivo de la suite de pruebas es garantizar el correcto funcionamiento del 
 | **Validación de Stock** | `__tests__/stockValidation.test.ts` | 12 | ✅ PASS | Bloqueo de sobreventa (stock excedido), control de stock agotado (stock = 0), cantidades <= 0 y alertas de stock mínimo. |
 | **Repositorio de Productos** | `__tests__/productRepository.test.ts` | 10 | ✅ PASS | Búsqueda por texto (insensible a mayúsculas), consulta por código de barras, formateo de entidades y gestión de excepciones. |
 | **Transacción y RPC Venta** | `__tests__/saleTransaction.test.ts` | 8 | ✅ PASS | Validación de payload JSON hacia RPC `registrar_venta_atomica`, bloqueo FOR UPDATE, reversión atómica y lectura de ventas recientes. |
+| **Gestión de Ventas y Devoluciones** | `__tests__/saleManagement.test.ts` | 10 | ✅ PASS | Búsqueda por # venta, filtros por estado, inmutabilidad (regla estricta no-DELETE), devolución atómica con Kardex, anulación controlada, cancelación de venta abierta y KPIs diarios. |
+| **Imágenes en Supabase Storage** | `__tests__/productImages.test.ts` | 6 | ✅ PASS | URLs públicas de imágenes en Supabase Storage, fallback reactivo y formato responsive de imágenes farmacéuticas. |
 
 ---
 

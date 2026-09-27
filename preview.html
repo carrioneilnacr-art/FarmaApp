@@ -185,6 +185,48 @@
                 <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </button>
 
+              <button onclick="navigateTab('ventas')" class="w-full bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl p-3.5 flex items-center gap-3 transition text-left shadow-sm">
+                <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <div class="font-bold text-xs text-zinc-900 flex items-center gap-1.5">
+                    Gestión de Ventas
+                    <span id="sales-badge" class="text-[9px] font-bold bg-teal-100 text-teal-800 px-1.5 py-0.5 rounded">3 hoy</span>
+                  </div>
+                  <div class="text-[10px] text-zinc-500">Historial, devoluciones, anulación e incidencias</div>
+                </div>
+                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+
+              <!-- Daily Summary Card on Home -->
+              <div class="p-3.5 bg-white border border-zinc-200 rounded-2xl space-y-2 shadow-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Métricas del Turno</span>
+                  <span class="text-[10px] text-zinc-400 font-mono" id="home-kpi-date">Hoy</span>
+                </div>
+                <div class="flex items-baseline justify-between bg-zinc-50 p-2.5 rounded-xl border border-zinc-200">
+                  <span class="text-xs text-zinc-600 font-medium">Ventas Emitidas</span>
+                  <span class="text-sm font-bold font-mono text-zinc-900" id="home-kpi-total">S/ 0.00</span>
+                </div>
+                <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
+                  <div class="p-1.5 rounded-lg bg-zinc-50 border border-zinc-200">
+                    <div class="text-zinc-500">Ventas</div>
+                    <div class="font-bold text-xs text-zinc-900" id="home-kpi-count">0</div>
+                  </div>
+                  <div class="p-1.5 rounded-lg bg-zinc-50 border border-zinc-200">
+                    <div class="text-zinc-500">Devoluciones</div>
+                    <div class="font-bold text-xs text-teal-700" id="home-kpi-devs">0</div>
+                  </div>
+                  <div class="p-1.5 rounded-lg bg-zinc-50 border border-zinc-200">
+                    <div class="text-zinc-500">Anuladas</div>
+                    <div class="font-bold text-xs text-rose-700" id="home-kpi-annuls">0</div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Database pill -->
               <div class="p-3 bg-white border border-zinc-200 rounded-xl flex items-center justify-between text-[11px] shadow-sm">
                 <span class="text-zinc-600 font-medium">Función RPC Atómica</span>
@@ -311,10 +353,56 @@
               </div>
             </div>
 
+            <!-- SCREEN 5: HISTORIAL Y GESTION DE VENTAS -->
+            <div id="screen-ventas" class="absolute inset-0 flex flex-col p-3.5 hidden bg-zinc-50 overflow-y-auto">
+              <!-- Header -->
+              <div class="flex items-center justify-between pb-2 border-b border-zinc-200 mb-2">
+                <div>
+                  <div class="text-xs font-bold text-zinc-900">Gestión de Ventas</div>
+                  <div class="text-[10px] text-zinc-500">Trazabilidad e historial de comprobantes</div>
+                </div>
+                <span class="text-[9px] font-mono bg-teal-50 text-teal-800 border border-teal-200 px-2 py-0.5 rounded font-semibold">Inmutable</span>
+              </div>
+
+              <!-- Search input -->
+              <div class="relative mb-2">
+                <input id="ventas-search" type="text" oninput="handleSalesSearch(this.value)" placeholder="Buscar por # venta, código o cliente..." class="w-full bg-white border border-zinc-300 text-zinc-900 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:border-zinc-800 shadow-sm placeholder:text-zinc-400">
+                <svg class="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              </div>
+
+              <!-- Status Filters -->
+              <div class="flex gap-1 overflow-x-auto pb-1.5 mb-2">
+                <button onclick="filterSalesStatus('TODOS', this)" class="sale-cat-pill px-2.5 py-1 rounded text-[10px] font-semibold bg-zinc-900 text-white whitespace-nowrap">Todas</button>
+                <button onclick="filterSalesStatus('EMITIDA', this)" class="sale-cat-pill px-2.5 py-1 rounded text-[10px] font-medium bg-white border border-zinc-200 text-zinc-700 whitespace-nowrap">Emitidas</button>
+                <button onclick="filterSalesStatus('ANULADA', this)" class="sale-cat-pill px-2.5 py-1 rounded text-[10px] font-medium bg-white border border-zinc-200 text-zinc-700 whitespace-nowrap">Anuladas</button>
+                <button onclick="filterSalesStatus('DEVUELTA', this)" class="sale-cat-pill px-2.5 py-1 rounded text-[10px] font-medium bg-white border border-zinc-200 text-zinc-700 whitespace-nowrap">Devueltas</button>
+              </div>
+
+              <!-- List of Sales -->
+              <div class="space-y-2 pb-14" id="sales-list-container"></div>
+            </div>
+
+            <!-- SCREEN 6: VENTA DETALLE & GESTION -->
+            <div id="screen-venta-detail" class="absolute inset-0 flex flex-col p-3.5 hidden bg-zinc-50 overflow-y-auto">
+              <!-- Back Header -->
+              <div class="flex items-center gap-2 pb-2 border-b border-zinc-200 mb-2">
+                <button onclick="navigateTab('ventas')" class="p-1 rounded-lg hover:bg-zinc-200 text-zinc-700">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="flex-1">
+                  <div class="text-xs font-bold text-zinc-900" id="vd-title">Detalle de Operación</div>
+                  <div class="text-[10px] text-zinc-500" id="vd-meta">Comprobante emitido</div>
+                </div>
+                <span id="vd-status-chip" class="text-[10px] font-bold px-2 py-0.5 rounded">EMITIDA</span>
+              </div>
+
+              <div id="vd-content" class="space-y-3 pb-16"></div>
+            </div>
+
           </div>
 
           <!-- Bottom Navigation Bar -->
-          <div class="bg-white border-t border-zinc-200 px-4 py-2 flex justify-around items-end pb-3 z-40">
+          <div class="bg-white border-t border-zinc-200 px-3 py-2 flex justify-around items-end pb-3 z-40">
             <button onclick="navigateTab('home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-zinc-900 font-bold">
               <svg style="width:19px;height:19px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
               <span class="text-[9px]">Inicio</span>
@@ -333,6 +421,10 @@
               <svg style="width:19px;height:19px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
               <span class="text-[9px]">Venta</span>
               <span id="nav-badge" class="absolute -top-0.5 right-1.5 bg-zinc-900 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">0</span>
+            </button>
+            <button onclick="navigateTab('ventas')" id="nav-ventas" class="flex flex-col items-center gap-0.5 text-zinc-500 hover:text-zinc-900 font-medium">
+              <svg style="width:19px;height:19px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              <span class="text-[9px]">Historial</span>
             </button>
           </div>
 
@@ -413,6 +505,60 @@
             </div>
           </div>
 
+          <!-- Devolution Modal -->
+          <div id="dev-modal" class="absolute inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden backdrop-blur-sm">
+            <div class="bg-white rounded-3xl p-4 w-full max-h-[90%] flex flex-col space-y-3 text-left shadow-2xl overflow-y-auto">
+              <div class="flex items-center justify-between border-b pb-2">
+                <div class="font-bold text-xs text-zinc-900">Registrar Devolución de Producto</div>
+                <button onclick="closeDevModal()" class="w-6 h-6 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 hover:text-black font-bold text-xs">×</button>
+              </div>
+              <div class="text-[11px] text-zinc-600">
+                Seleccione las unidades a retornar al almacén. El stock se reincorporará automáticamente en el inventario.
+              </div>
+              <div id="dev-items-container" class="space-y-2 border rounded-xl p-2 bg-zinc-50 max-h-48 overflow-y-auto"></div>
+              <div>
+                <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Motivo</label>
+                <select id="dev-reason-select" class="w-full bg-white border border-zinc-300 text-zinc-900 text-xs rounded-xl p-2">
+                  <option value="Medicamento equivocado">Medicamento equivocado</option>
+                  <option value="Empaque deteriorado">Empaque deteriorado</option>
+                  <option value="Cliente desistió">Cliente desistió</option>
+                  <option value="Reacción adversa / Alergia">Reacción adversa / Alergia</option>
+                  <option value="Error de digitación">Error de digitación</option>
+                </select>
+              </div>
+              <div class="bg-teal-50 border border-teal-200 rounded-xl p-2.5 text-[11px] text-teal-800 flex justify-between font-bold">
+                <span>Total a Reembolsar:</span>
+                <span id="dev-refund-total">S/ 0.00</span>
+              </div>
+              <button onclick="confirmDevolutionAction()" id="btn-submit-dev" class="w-full bg-teal-800 hover:bg-teal-900 text-white font-bold py-2.5 rounded-xl text-xs transition">
+                Confirmar Devolución (+Stock)
+              </button>
+            </div>
+          </div>
+
+          <!-- Annul Modal -->
+          <div id="annul-modal" class="absolute inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden backdrop-blur-sm">
+            <div class="bg-white rounded-3xl p-4 w-full space-y-3 text-left shadow-2xl">
+              <div class="flex items-center justify-between border-b pb-2">
+                <div class="font-bold text-xs text-rose-700">Anulación Controlada de Venta</div>
+                <button onclick="closeAnnulModal()" class="w-6 h-6 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 hover:text-black font-bold text-xs">×</button>
+              </div>
+              <div class="text-[11px] text-zinc-600">
+                La venta no se borrará físicamente. Cambiará de estado a <strong>ANULADA</strong> conservando el registro histórico.
+              </div>
+              <div>
+                <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Motivo de Anulación</label>
+                <input id="annul-reason" type="text" placeholder="Ej. Error en forma de pago / desistimiento" class="w-full bg-white border border-zinc-300 text-zinc-900 text-xs rounded-xl p-2 focus:outline-none focus:border-zinc-800">
+              </div>
+              <label class="flex items-center gap-2 cursor-pointer bg-zinc-50 p-2 rounded-xl border border-zinc-200">
+                <input type="checkbox" id="annul-revert-stock" checked class="w-4 h-4 text-teal-700 rounded">
+                <span class="text-xs text-zinc-800 font-medium">Reincorporar productos vendidos al stock</span>
+              </label>
+              <button onclick="confirmAnnulAction()" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold py-2.5 rounded-xl text-xs transition">
+                Confirmar Anulación
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -856,15 +1002,468 @@
       renderProductList();
     }
 
-    function navigateTab(tab) {
-      ['home','search','scan','cart'].forEach(t => {
-        document.getElementById(`screen-${t}`).classList.add('hidden');
-        const n = document.getElementById(`nav-${t}`);
-        if (n) { n.classList.remove('text-zinc-900', 'font-bold'); n.classList.add('text-zinc-500', 'font-medium'); }
+    // --- Proceso 2: Gestión y Corrección de Ventas State ---
+    let salesHistory = [
+      {
+        id: 'vta-00125',
+        number: '#000125',
+        code: 'VTA-20260927-000125',
+        total: 38.50,
+        subtotal: 32.63,
+        igv: 5.87,
+        date: '15:42',
+        fullDate: '27/09/2026 15:42',
+        method: 'EFECTIVO',
+        status: 'EMITIDA',
+        clientName: 'Consumidor Final',
+        clientDoc: '-',
+        receipt: { type: 'BOLETA', serie: 'B001', number: '00000125' },
+        items: [
+          { id: 1, code: 'BOT-000001', name: 'Paracetamol 500 mg (Caja x 100)', price: 15.50, qty: 2, returnedQty: 0, sub: 31.00 },
+          { id: 16, code: 'BOT-000016', name: 'Alcohol Etílico 70° (Frasco 250 ml)', price: 7.50, qty: 1, returnedQty: 0, sub: 7.50 }
+        ],
+        history: [
+          { event: 'EMISION_COMPROBANTE', desc: 'Boleta de Venta B001-00000125 emitida exitosamente', time: '15:42' },
+          { event: 'KARDEX_SALIDA', desc: 'Deducción de 3 unidades en inventario (Paracetamol x2, Alcohol x1)', time: '15:42' }
+        ]
+      },
+      {
+        id: 'vta-00124',
+        number: '#000124',
+        code: 'VTA-20260927-000124',
+        total: 22.50,
+        subtotal: 19.07,
+        igv: 3.43,
+        date: '14:20',
+        fullDate: '27/09/2026 14:20',
+        method: 'YAPE',
+        status: 'EMITIDA',
+        clientName: 'Carlos Mendoza',
+        clientDoc: '43928172',
+        receipt: { type: 'BOLETA', serie: 'B001', number: '00000124' },
+        items: [
+          { id: 4, code: 'BOT-000004', name: 'Panadol Antigripal NF (Caja x 24)', price: 22.50, qty: 1, returnedQty: 0, sub: 22.50 }
+        ],
+        history: [
+          { event: 'EMISION_COMPROBANTE', desc: 'Boleta de Venta B001-00000124 emitida exitosamente', time: '14:20' },
+          { event: 'KARDEX_SALIDA', desc: 'Deducción de 1 unidad en inventario', time: '14:20' }
+        ]
+      },
+      {
+        id: 'vta-00123',
+        number: '#000123',
+        code: 'VTA-20260927-000123',
+        total: 12.00,
+        subtotal: 10.17,
+        igv: 1.83,
+        date: '11:15',
+        fullDate: '27/09/2026 11:15',
+        method: 'PLIN',
+        status: 'ANULADA',
+        clientName: 'Consumidor Final',
+        clientDoc: '-',
+        receipt: { type: 'BOLETA', serie: 'B001', number: '00000123' },
+        items: [
+          { id: 2, code: 'BOT-000002', name: 'Ibuprofeno 400 mg (Caja x 20)', price: 12.00, qty: 1, returnedQty: 0, sub: 12.00 }
+        ],
+        history: [
+          { event: 'EMISION_COMPROBANTE', desc: 'Boleta B001-00000123 emitida', time: '11:15' },
+          { event: 'ANULACION_VENTA', desc: 'Venta anulada por error en digitación de comprobante. Stock revertido (+1)', time: '11:18' }
+        ]
+      }
+    ];
+
+    let currentSelectedSaleId = null;
+    let salesFilterStatus = 'TODOS';
+    let salesSearchQuery = '';
+    let devolutionSelection = {}; // { prodId: qtyToReturn }
+
+    function updateKpis() {
+      const activeSales = salesHistory.filter(s => s.status !== 'ANULADA');
+      const totalVendido = activeSales.reduce((acc, s) => acc + s.total, 0);
+      const devsCount = salesHistory.filter(s => s.status === 'DEVUELTA').length;
+      const annulsCount = salesHistory.filter(s => s.status === 'ANULADA').length;
+
+      document.getElementById('home-kpi-total').textContent = `S/ ${totalVendido.toFixed(2)}`;
+      document.getElementById('home-kpi-count').textContent = activeSales.length;
+      document.getElementById('home-kpi-devs').textContent = devsCount;
+      document.getElementById('home-kpi-annuls').textContent = annulsCount;
+      document.getElementById('sales-badge').textContent = `${salesHistory.length} ops`;
+      document.getElementById('stat-sales').textContent = salesHistory.length;
+      document.getElementById('stat-revenue').textContent = `S/ ${totalVendido.toFixed(2)}`;
+    }
+
+    function renderSalesList() {
+      const container = document.getElementById('sales-list-container');
+      if (!container) return;
+
+      const q = salesSearchQuery.toLowerCase();
+      const filtered = salesHistory.filter(s => {
+        const matchesStatus = salesFilterStatus === 'TODOS' || s.status === salesFilterStatus;
+        const matchesQ = s.number.toLowerCase().includes(q) ||
+                         s.code.toLowerCase().includes(q) ||
+                         (s.clientName && s.clientName.toLowerCase().includes(q));
+        return matchesStatus && matchesQ;
       });
-      document.getElementById(`screen-${tab}`).classList.remove('hidden');
+
+      if (!filtered.length) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-xs text-zinc-500 font-medium">
+            No se encontraron operaciones registradas.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(s => {
+        let badgeColor = 'bg-teal-50 text-teal-800 border-teal-200';
+        if (s.status === 'ANULADA') badgeColor = 'bg-rose-50 text-rose-800 border-rose-200';
+        if (s.status === 'DEVUELTA') badgeColor = 'bg-slate-100 text-slate-800 border-slate-300';
+
+        const totalItemsCount = s.items.reduce((acc, it) => acc + it.qty, 0);
+
+        return `
+          <div onclick="openSaleDetail('${s.id}')" class="p-3 bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="font-extrabold text-xs font-mono text-zinc-900">${s.number}</span>
+                <span class="text-[10px] text-zinc-400 font-medium">· ${s.date}</span>
+              </div>
+              <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${badgeColor}">
+                ${s.status}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between text-xs">
+              <div class="text-[11px] text-zinc-600 truncate max-w-[180px]">
+                ${s.items.map(i => `${i.name} (x${i.qty})`).join(', ')}
+              </div>
+              <div class="font-extrabold font-mono text-zinc-900 ml-2">
+                S/ ${s.total.toFixed(2)}
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[10px] text-zinc-400 pt-1 border-t border-zinc-100 font-mono">
+              <span>${s.receipt.type} ${s.receipt.serie}-${s.receipt.number}</span>
+              <span class="uppercase">${s.method} · ${totalItemsCount} uds</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterSalesStatus(st, btn) {
+      salesFilterStatus = st;
+      document.querySelectorAll('.sale-cat-pill').forEach(b => {
+        b.className = 'sale-cat-pill px-2.5 py-1 rounded text-[10px] font-medium bg-white border border-zinc-200 text-zinc-700 whitespace-nowrap';
+      });
+      btn.className = 'sale-cat-pill px-2.5 py-1 rounded text-[10px] font-semibold bg-zinc-900 text-white whitespace-nowrap';
+      renderSalesList();
+    }
+
+    function handleSalesSearch(val) {
+      salesSearchQuery = val;
+      renderSalesList();
+    }
+
+    function openSaleDetail(id) {
+      currentSelectedSaleId = id;
+      const sale = salesHistory.find(s => s.id === id);
+      if (!sale) return;
+
+      document.getElementById('vd-title').textContent = `Operación ${sale.number}`;
+      document.getElementById('vd-meta').textContent = `${sale.fullDate} · ${sale.code}`;
+
+      const chip = document.getElementById('vd-status-chip');
+      chip.textContent = sale.status;
+      if (sale.status === 'EMITIDA') {
+        chip.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200';
+      } else if (sale.status === 'ANULADA') {
+        chip.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-800 border border-rose-200';
+      } else {
+        chip.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-300';
+      }
+
+      const isAnnulled = sale.status === 'ANULADA';
+
+      let contentHtml = `
+        <!-- Comprobante Fiscal Simulado -->
+        <div class="p-3 bg-white border border-zinc-200 rounded-2xl shadow-sm space-y-2">
+          <div class="flex items-center justify-between text-xs border-b border-zinc-100 pb-2">
+            <span class="font-bold text-zinc-700">COMPROBANTE ELECTRÓNICO</span>
+            <span class="font-mono text-xs font-extrabold text-zinc-900">${sale.receipt.type} ${sale.receipt.serie}-${sale.receipt.number}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[11px] text-zinc-600">
+            <div><span class="text-zinc-400">Cliente:</span> ${sale.clientName}</div>
+            <div><span class="text-zinc-400">Doc:</span> ${sale.clientDoc}</div>
+            <div><span class="text-zinc-400">Pago:</span> ${sale.method}</div>
+            <div><span class="text-zinc-400">Emisión:</span> ${sale.date}</div>
+          </div>
+        </div>
+
+        <!-- Regla de Inmutabilidad -->
+        <div class="p-3 bg-teal-50 border border-teal-200 rounded-2xl text-[11px] text-teal-900 leading-relaxed flex items-start gap-2">
+          <svg class="w-4 h-4 text-teal-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div>
+            <strong>Regla de comprobante emitido:</strong> No es posible modificar o eliminar directamente este comprobante. Toda corrección se realiza vía devolución o anulación formal con trazabilidad de Kardex.
+          </div>
+        </div>
+
+        <!-- Items Vendidos -->
+        <div class="bg-white border border-zinc-200 rounded-2xl p-3 shadow-sm space-y-2">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Líneas de Comprobante</div>
+          <div class="divide-y divide-zinc-100 text-xs">
+            ${sale.items.map(it => `
+              <div class="py-2 flex items-center justify-between">
+                <div>
+                  <div class="font-semibold text-zinc-900">${it.name}</div>
+                  <div class="text-[10px] text-zinc-500 font-mono">
+                    ${it.qty} uds × S/ ${it.price.toFixed(2)}
+                    ${it.returnedQty > 0 ? `<span class="text-teal-700 font-bold ml-1">(Devuelto: ${it.returnedQty})</span>` : ''}
+                  </div>
+                </div>
+                <div class="font-mono font-bold text-zinc-900">S/ ${it.sub.toFixed(2)}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="pt-2 border-t border-zinc-200 flex justify-between font-extrabold text-sm text-zinc-900">
+            <span>TOTAL</span>
+            <span class="font-mono">S/ ${sale.total.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <!-- Historial / Auditoría -->
+        <div class="bg-white border border-zinc-200 rounded-2xl p-3 shadow-sm space-y-2">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Línea de Tiempo de Auditoría</div>
+          <div class="space-y-2 text-[11px]">
+            ${sale.history.map((h, i) => `
+              <div class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-600 mt-1.5 shrink-0"></span>
+                <div class="flex-1">
+                  <div class="font-bold text-zinc-800 text-[10px] uppercase">${h.event} · <span class="text-zinc-400 font-mono">${h.time}</span></div>
+                  <div class="text-zinc-600 leading-snug">${h.desc}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        ${!isAnnulled ? `
+          <div class="space-y-2 pt-1">
+            <button onclick="openDevolutionModal('${sale.id}')" class="w-full bg-teal-800 hover:bg-teal-900 text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+              <span>Registrar Devolución de Producto</span>
+            </button>
+
+            <button onclick="startLinkedSale('${sale.id}')" class="w-full bg-white border border-zinc-300 hover:border-zinc-500 text-zinc-900 font-bold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              <span>Agregar Producto (Venta Relacionada)</span>
+            </button>
+
+            <button onclick="openAnnulModal('${sale.id}')" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              <span>Anulación Controlada de Operación</span>
+            </button>
+          </div>
+        ` : `
+          <div class="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-center text-xs text-rose-800 font-semibold">
+            Esta venta fue ANULADA. No admite modificaciones adicionales.
+          </div>
+        `}
+      `;
+
+      document.getElementById('vd-content').innerHTML = contentHtml;
+      navigateTab('venta-detail');
+    }
+
+    // Modal de Devolución
+    function openDevolutionModal(saleId) {
+      currentSelectedSaleId = saleId;
+      const sale = salesHistory.find(s => s.id === saleId);
+      if (!sale) return;
+
+      devolutionSelection = {};
+      const container = document.getElementById('dev-items-container');
+
+      container.innerHTML = sale.items.map(it => {
+        const availableToReturn = it.qty - (it.returnedQty || 0);
+        devolutionSelection[it.id] = 0;
+        const currentProd = products.find(p => p.id === it.id);
+        const currentStock = currentProd ? currentProd.stock : 0;
+
+        return `
+          <div class="p-2 bg-white border border-zinc-200 rounded-xl space-y-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-zinc-900">${it.name}</span>
+              <span class="font-mono text-zinc-600">S/ ${it.price.toFixed(2)}</span>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-zinc-500">
+              <span>Vendido: ${it.qty} (Disp: ${availableToReturn}) · Stock almacén: <strong class="text-zinc-800" id="stock-now-${it.id}">${currentStock}</strong></span>
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="changeDevItemQty(${it.id}, -1, ${availableToReturn}, ${it.price})" class="w-6 h-6 rounded bg-zinc-100 hover:bg-zinc-200 font-bold text-xs">-</button>
+                <span id="dev-qty-${it.id}" class="w-6 text-center font-bold text-xs font-mono">0</span>
+                <button type="button" onclick="changeDevItemQty(${it.id}, 1, ${availableToReturn}, ${it.price})" class="w-6 h-6 rounded bg-zinc-100 hover:bg-zinc-200 font-bold text-xs">+</button>
+              </div>
+            </div>
+            <div class="text-[10px] text-teal-700 font-medium" id="stock-preview-${it.id}">
+              Retorno: +0 u. → Stock nuevo: ${currentStock}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('dev-refund-total').textContent = 'S/ 0.00';
+      document.getElementById('dev-modal').classList.remove('hidden');
+    }
+
+    function changeDevItemQty(prodId, delta, maxAvailable, price) {
+      const current = devolutionSelection[prodId] || 0;
+      const next = current + delta;
+      if (next < 0 || next > maxAvailable) return;
+      devolutionSelection[prodId] = next;
+
+      document.getElementById(`dev-qty-${prodId}`).textContent = next;
+
+      const p = products.find(x => x.id === prodId);
+      const curStock = p ? p.stock : 0;
+      document.getElementById(`stock-preview-${prodId}`).textContent = `Retorno: +${next} u. → Stock nuevo: ${curStock + next}`;
+
+      // Calculate total refund
+      const sale = salesHistory.find(s => s.id === currentSelectedSaleId);
+      let totalRefund = 0;
+      if (sale) {
+        sale.items.forEach(it => {
+          const qty = devolutionSelection[it.id] || 0;
+          totalRefund += qty * it.price;
+        });
+      }
+      document.getElementById('dev-refund-total').textContent = `S/ ${totalRefund.toFixed(2)}`;
+    }
+
+    function confirmDevolutionAction() {
+      const sale = salesHistory.find(s => s.id === currentSelectedSaleId);
+      if (!sale) return;
+
+      const reason = document.getElementById('dev-reason-select').value;
+      let totalRefund = 0;
+      let returnedCount = 0;
+
+      sale.items.forEach(it => {
+        const qty = devolutionSelection[it.id] || 0;
+        if (qty > 0) {
+          it.returnedQty = (it.returnedQty || 0) + qty;
+          totalRefund += qty * it.price;
+          returnedCount += qty;
+          // Reingreso atómico a stock en el catálogo
+          const prod = products.find(p => p.id === it.id);
+          if (prod) prod.stock += qty;
+        }
+      });
+
+      if (returnedCount === 0) {
+        showToast('Seleccione al menos 1 unidad para devolver');
+        return;
+      }
+
+      sale.status = 'DEVUELTA';
+      sale.history.unshift({
+        event: 'DEVOLUCION_REGISTRADA',
+        desc: `Devolución de ${returnedCount} unidad(es) por S/ ${totalRefund.toFixed(2)}. Motivo: ${reason}. Kardex actualizado (+${returnedCount}).`,
+        time: 'Ahora'
+      });
+
+      closeDevModal();
+      showToast(`✓ Devolución registrada: +${returnedCount} unidades a inventario`);
+      renderProductList();
+      renderQuickList();
+      updateKpis();
+      openSaleDetail(sale.id);
+    }
+
+    function closeDevModal() {
+      document.getElementById('dev-modal').classList.add('hidden');
+    }
+
+    // Modal de Anulación
+    function openAnnulModal(saleId) {
+      currentSelectedSaleId = saleId;
+      document.getElementById('annul-reason').value = '';
+      document.getElementById('annul-revert-stock').checked = true;
+      document.getElementById('annul-modal').classList.remove('hidden');
+    }
+
+    function closeAnnulModal() {
+      document.getElementById('annul-modal').classList.add('hidden');
+    }
+
+    function confirmAnnulAction() {
+      const sale = salesHistory.find(s => s.id === currentSelectedSaleId);
+      if (!sale) return;
+
+      const reason = document.getElementById('annul-reason').value.trim() || 'Desistimiento de cliente';
+      const revertStock = document.getElementById('annul-revert-stock').checked;
+
+      let unitsRestored = 0;
+      if (revertStock) {
+        sale.items.forEach(it => {
+          const qtyToRevert = it.qty - (it.returnedQty || 0);
+          if (qtyToRevert > 0) {
+            unitsRestored += qtyToRevert;
+            const prod = products.find(p => p.id === it.id);
+            if (prod) prod.stock += qtyToRevert;
+          }
+        });
+      }
+
+      sale.status = 'ANULADA';
+      sale.history.unshift({
+        event: 'ANULACION_VENTA',
+        desc: `Venta anulada. Motivo: ${reason}. ${revertStock ? `Stock restaurado (+${unitsRestored} u.) en Kardex.` : 'Sin reincorporación de stock.'}`,
+        time: 'Ahora'
+      });
+
+      closeAnnulModal();
+      showToast('✓ Venta anulada conservando trazabilidad');
+      renderProductList();
+      renderQuickList();
+      updateKpis();
+      openSaleDetail(sale.id);
+    }
+
+    function startLinkedSale(saleId) {
+      const sale = salesHistory.find(s => s.id === saleId);
+      showToast(`Iniciando venta vinculada a ${sale ? sale.number : ''}`);
+      navigateTab('search');
+    }
+
+    function navigateTab(tab) {
+      const allTabs = ['home', 'search', 'scan', 'cart', 'ventas', 'venta-detail'];
+      allTabs.forEach(t => {
+        const screen = document.getElementById(`screen-${t}`);
+        if (screen) screen.classList.add('hidden');
+        const nav = document.getElementById(`nav-${t}`);
+        if (nav) {
+          nav.classList.remove('text-zinc-900', 'font-bold');
+          nav.classList.add('text-zinc-500', 'font-medium');
+        }
+      });
+
+      const activeScreen = document.getElementById(`screen-${tab}`);
+      if (activeScreen) activeScreen.classList.remove('hidden');
+
       const activeNav = document.getElementById(`nav-${tab}`);
-      if (activeNav) { activeNav.classList.remove('text-zinc-500', 'font-medium'); activeNav.classList.add('text-zinc-900', 'font-bold'); }
+      if (activeNav) {
+        activeNav.classList.remove('text-zinc-500', 'font-medium');
+        activeNav.classList.add('text-zinc-900', 'font-bold');
+      }
+
+      if (tab === 'ventas') {
+        renderSalesList();
+      }
+      if (tab === 'home') {
+        updateKpis();
+      }
     }
 
     let toastTimer;
@@ -880,12 +1479,74 @@
       products = JSON.parse(JSON.stringify(PRODUCTS));
       cart = []; salesCount = 0; revenue = 0;
       init();
-      document.getElementById('stat-sales').textContent = 0;
-      document.getElementById('stat-revenue').textContent = 'S/ 0.00';
+      updateKpis();
       showToast('Catálogo restablecido');
     }
 
+    // Wrap confirmSale to also add to salesHistory
+    const _originalConfirmSale = confirmSale;
+    confirmSale = function() {
+      if (!cart.length) return;
+      for (const item of cart) {
+        const p = products.find(x => x.id === item.id);
+        if (!p || p.stock < item.qty) { showToast(`Stock insuficiente: ${item.name}`); return; }
+      }
+      const total = cart.reduce((s, i) => s + i.sub, 0);
+      const subtotal = total / 1.18;
+      const igv = total - subtotal;
+      cart.forEach(item => {
+        const p = products.find(x => x.id === item.id);
+        if (p) p.stock -= item.qty;
+      });
+      salesCount++;
+      revenue += total;
+      const seqStr = String(salesCount + 125).padStart(6, '0');
+      const code = `VTA-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${seqStr}`;
+
+      const newSale = {
+        id: 'vta-' + Date.now(),
+        number: '#' + seqStr,
+        code: code,
+        total: total,
+        subtotal: subtotal,
+        igv: igv,
+        date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        fullDate: new Date().toLocaleString(),
+        method: selectedPay,
+        status: 'EMITIDA',
+        clientName: 'Consumidor Final',
+        clientDoc: '-',
+        receipt: { type: 'BOLETA', serie: 'B001', number: seqStr },
+        items: cart.map(item => ({
+          id: item.id,
+          code: item.code,
+          name: item.name,
+          price: item.price,
+          qty: item.qty,
+          returnedQty: 0,
+          sub: item.sub
+        })),
+        history: [
+          { event: 'EMISION_COMPROBANTE', desc: `Boleta B001-${seqStr} emitida exitosamente`, time: 'Ahora' },
+          { event: 'KARDEX_SALIDA', desc: `Deducción de ${cart.reduce((s,i)=>s+i.qty,0)} unidad(es) en inventario`, time: 'Ahora' }
+        ]
+      };
+      salesHistory.unshift(newSale);
+
+      document.getElementById('m-code').textContent = code;
+      document.getElementById('m-method').textContent = selectedPay;
+      document.getElementById('m-total').textContent = `S/ ${total.toFixed(2)}`;
+      document.getElementById('modal').classList.remove('hidden');
+      cart = [];
+      renderCart();
+      renderProductList();
+      renderQuickList();
+      updateKpis();
+    };
+
     init();
+    updateKpis();
+    renderSalesList();
   </script>
 </body>
 </html>

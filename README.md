@@ -142,8 +142,10 @@ Consulta la [Guía de Despliegue](./docs/deployment.md) para conocer los pasos d
 | :--- | :--- |
 | 📄 [**Requerimientos de Software**](./docs/requirements.md) | Especificación de RF, RNF y Criterios de Aceptación. |
 | 🔄 [**Procesos de Negocio (AS-IS / TO-BE)**](./docs/process.md) | Diagramas de flujo en Mermaid y matriz comparativa de tiempos. |
-| 📋 [**Casos de Uso**](./docs/use-cases.md) | Detalle de CU-01 a CU-04 con flujos principales y alternativos. |
+| 📋 [**Casos de Uso (Entrega 1: POS)**](./docs/use-cases.md) | Detalle de CU-01 a CU-04 con flujos principales y alternativos. |
+| 🛡️ [**Proceso 2: Gestión y Corrección de Ventas**](./docs/process-2-gestion-ventas.md) | Inmutabilidad de ventas, devoluciones atómicas, anulación controlada, Kardex farmacéutico y diseño Clinical Apothecary Minimalist. |
 | 🗄️ [**Base de Datos y Modelo ERD**](./docs/database.md) | Diccionario de datos, diagrama ERD, políticas RLS y transacciones RPC. |
-| 🧪 [**Plan y Matriz de Pruebas**](./docs/testing.md) | Casos de prueba funcionales, de escaneo, carrito y consistencia. |
+| 🧪 [**Plan y Matriz de Pruebas**](./docs/testing.md) | Casos de prueba funcionales, de escaneo, carrito, consistencia y 6 suites automatizadas con 58 tests. |
 | 🚀 [**Guía de Despliegue y EAS Build**](./docs/deployment.md) | Paso a paso para Supabase, Expo, compilación de APK y solución de errores. |
 | 📖 [**Manual de Usuario**](./docs/user-manual.md) | Guía operativa amigable para el trabajador de la botica. |
+| 💡 [**Explicación Práctica de la App**](./docs/EXPLICACION_PRACTICA.md) | Guía ejecutiva y práctica de qué problemas resuelve FarmaApp y cómo funciona. |

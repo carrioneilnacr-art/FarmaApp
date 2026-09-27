@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,19 +6,49 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../context/CartContext';
+import { saleRepository } from '../repositories/saleRepository';
+import { ResumenDiario } from '../types/database';
+import { DailySummaryCard } from '../components/DailySummaryCard';
 import { Colors } from '../theme/colors';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { totalItems, totalAmount } = useCart();
+  const [resumen, setResumen] = useState<ResumenDiario | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchSummary = useCallback(async () => {
+    try {
+      const data = await saleRepository.getDailySummary();
+      setResumen(data);
+    } catch (err) {
+      console.error('Error fetching daily summary on home:', err);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSummary();
+  }, [fetchSummary]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchSummary();
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[Colors.secondary]} />}
+      >
         {/* Banner de Bienvenida */}
         <View style={styles.heroBanner}>
           <View style={styles.heroContent}>
@@ -116,14 +146,50 @@ export default function HomeScreen() {
             </View>
             <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
           </TouchableOpacity>
+
+          {/* Tarjeta 4: Gestión y Corrección de Ventas */}
+          <TouchableOpacity
+            style={styles.actionCard}
+            activeOpacity={0.85}
+            onPress={() => router.push('/ventas')}
+          >
+            <View style={[styles.actionIconContainer, { backgroundColor: Colors.tealWash }]}>
+              <Ionicons name="receipt-outline" size={28} color={Colors.secondary} />
+            </View>
+            <View style={styles.actionTextContainer}>
+              <View style={styles.cartTitleRow}>
+                <Text style={styles.actionCardTitle}>Gestión de Ventas</Text>
+                {resumen && resumen.ventas_realizadas > 0 && (
+                  <View style={[styles.itemsBadge, { backgroundColor: Colors.secondary }]}>
+                    <Text style={styles.itemsBadgeText}>{resumen.ventas_realizadas} hoy</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.actionCardSubtitle}>
+                Historial, devoluciones, anulación e incidencias
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
+          </TouchableOpacity>
         </View>
+
+        {/* Resumen Diario de Operaciones */}
+        {resumen && (
+          <View style={{ marginTop: 20 }}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Métricas del Turno</Text>
+              <Text style={styles.sectionSubtitle}>Auditoría de operaciones del día</Text>
+            </View>
+            <DailySummaryCard resumen={resumen} />
+          </View>
+        )}
 
         {/* Información / Ayuda rápida */}
         <View style={styles.infoBox}>
-          <Ionicons name="information-circle-outline" size={20} color={Colors.primary} />
+          <Ionicons name="shield-checkmark-outline" size={20} color={Colors.secondary} />
           <Text style={styles.infoBoxText}>
-            Las transacciones aplican validación atómica ACID en Supabase con bloqueo de stock
-            para evitar inconsistencias de inventario.
+            Trazabilidad garantizada: Las ventas emitidas son inmutables. Toda corrección se efectúa
+            mediante devolución atómica o anulación controlada con registro en Kardex.
           </Text>
         </View>
       </ScrollView>
