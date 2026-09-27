@@ -56,7 +56,7 @@ BEGIN
         15.50,
         60,
         10,
-        'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000001.jpg',
         true
     ),
     (
@@ -67,7 +67,7 @@ BEGIN
         12.00,
         45,
         8,
-        'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000002.jpg',
         true
     ),
     (
@@ -78,7 +78,7 @@ BEGIN
         18.00,
         35,
         5,
-        'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000003.jpg',
         true
     ),
     (
@@ -89,7 +89,7 @@ BEGIN
         22.50,
         50,
         10,
-        'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000004.jpg',
         true
     ),
     (
@@ -100,7 +100,7 @@ BEGIN
         28.00,
         30,
         5,
-        'https://images.unsplash.com/photo-1576602976047-174e57a47881?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000005.jpg',
         true
     ),
 
@@ -113,7 +113,7 @@ BEGIN
         32.00,
         40,
         10,
-        'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000006.jpg',
         true
     ),
     (
@@ -124,7 +124,7 @@ BEGIN
         25.00,
         45,
         10,
-        'https://images.unsplash.com/photo-1584362917165-526a968579e8?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000007.jpg',
         true
     ),
     (
@@ -135,7 +135,7 @@ BEGIN
         20.00,
         30,
         5,
-        'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000008.jpg',
         true
     ),
     (
@@ -146,7 +146,7 @@ BEGIN
         24.50,
         25,
         5,
-        'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000009.jpg',
         true
     ),
     (
@@ -157,7 +157,7 @@ BEGIN
         38.00,
         20,
         5,
-        'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000010.jpg',
         true
     ),
 
@@ -170,7 +170,7 @@ BEGIN
         10.00,
         70,
         15,
-        'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000011.jpg',
         true
     ),
     (
@@ -181,7 +181,7 @@ BEGIN
         9.50,
         65,
         15,
-        'https://images.unsplash.com/photo-1576602976047-174e57a47881?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000012.jpg',
         true
     ),
     (
@@ -192,7 +192,7 @@ BEGIN
         12.00,
         80,
         20,
-        'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000013.jpg',
         true
     ),
     (
@@ -203,7 +203,7 @@ BEGIN
         26.00,
         40,
         10,
-        'https://images.unsplash.com/photo-1584362917165-526a968579e8?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000014.jpg',
         true
     ),
     (
@@ -214,7 +214,7 @@ BEGIN
         34.00,
         35,
         8,
-        'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000015.jpg',
         true
     ),
 
@@ -227,7 +227,7 @@ BEGIN
         8.50,
         50,
         10,
-        'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000016.jpg',
         true
     ),
     (
@@ -238,7 +238,7 @@ BEGIN
         4.50,
         40,
         10,
-        'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000017.jpg',
         true
     ),
     (
@@ -249,7 +249,7 @@ BEGIN
         5.00,
         55,
         15,
-        'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000018.jpg',
         true
     ),
     (
@@ -260,7 +260,7 @@ BEGIN
         6.50,
         100,
         25,
-        'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000019.jpg',
         true
     ),
     (
@@ -271,7 +271,7 @@ BEGIN
         7.00,
         40,
         10,
-        'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000020.jpg',
         true
     ),
 
@@ -284,7 +284,7 @@ BEGIN
         45.00,
         25,
         5,
-        'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000021.jpg',
         true
     ),
     (
@@ -295,7 +295,7 @@ BEGIN
         14.00,
         30,
         8,
-        'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000022.jpg',
         true
     ),
     (
@@ -306,7 +306,7 @@ BEGIN
         22.00,
         20,
         5,
-        'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000023.jpg',
         true
     ),
     (
@@ -317,7 +317,7 @@ BEGIN
         9.00,
         45,
         10,
-        'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000024.jpg',
         true
     ),
     (
@@ -328,7 +328,7 @@ BEGIN
         8.00,
         60,
         15,
-        'https://images.unsplash.com/photo-1559591937-e10220202685?w=500&auto=format&fit=crop&q=60',
+        'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/BOT-000025.jpg',
         true
     )
     ON CONFLICT (codigo_barras) DO UPDATE SET

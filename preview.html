@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmaApp - Punto de Venta</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <script src="/zxing.min.js"></script>
+  <style>
+    @keyframes scan-line {
+      0%   { top: 12%; opacity: 0.4; }
+      50%  { top: 85%; opacity: 1; }
+      100% { top: 12%; opacity: 0.4; }
+    }
+    .scan-line { animation: scan-line 2.2s ease-in-out infinite; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-zinc-100 text-zinc-900 antialiased p-4 md:p-8 flex flex-col items-center min-h-screen">
+
+  <!-- Header -->
+  <div class="max-w-5xl w-full mb-6">
+    <div class="text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1">Simulador FarmaApp</div>
+    <div class="flex items-center justify-between flex-wrap gap-2">
+      <div>
+        <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight">FarmaApp — Punto de Venta</h1>
+        <p class="text-xs text-zinc-600 mt-0.5">
+          Botica San Martin · Sistema de Atención y Venta Rápida
+          <span class="ml-2 inline-flex items-center gap-1.5 font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+            Supabase Conectado
+          </span>
+        </p>
+      </div>
+      <div id="barcode-api-badge" class="text-xs font-mono px-3 py-1 rounded-md bg-white border border-zinc-300 text-zinc-700 shadow-sm">
+        Verificando cámara...
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- Left Panel -->
+    <div class="lg:col-span-5 space-y-4">
+
+      <!-- Barcode Test List -->
+      <div class="bg-white border border-zinc-200 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-zinc-700">Catálogo de 25 Medicamentos</span>
+          <span class="text-[10px] font-mono bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded font-semibold text-zinc-600">En Supabase</span>
+        </div>
+        <p class="text-xs text-zinc-500 mb-3 leading-relaxed">
+          Haz clic en cualquier producto para <strong>simular su escaneo inmediato</strong>, o activa la cámara web en el teléfono para escanearlo físicamente.
+        </p>
+        <div class="space-y-1 max-h-64 overflow-y-auto pr-1" id="quick-list"></div>
+      </div>
+
+      <!-- DB Stats -->
+      <div class="bg-white border border-zinc-200 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-zinc-700">Inventario y Ventas</span>
+          <button onclick="resetDatabase()" class="text-xs text-zinc-500 hover:text-zinc-900 border border-zinc-300 hover:border-zinc-400 px-2 py-0.5 rounded transition">Reiniciar</button>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+          <div class="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200">
+            <div class="text-[10px] text-zinc-500 mb-0.5 font-medium">Productos</div>
+            <div class="font-bold text-base text-zinc-900" id="stat-products">25</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200">
+            <div class="text-[10px] text-zinc-500 mb-0.5 font-medium">Ventas</div>
+            <div class="font-bold text-base text-zinc-900" id="stat-sales">0</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200">
+            <div class="text-[10px] text-zinc-500 mb-0.5 font-medium">Cobrado</div>
+            <div class="font-bold text-sm text-zinc-900" id="stat-revenue">S/ 0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assets Info -->
+      <div class="bg-white border border-zinc-200 rounded-2xl p-4 shadow-sm text-xs space-y-2">
+        <div class="text-zinc-800 font-bold">Imágenes de Códigos de Barra</div>
+        <p class="text-zinc-600">Los 25 códigos de barra reales Code128 en formato PNG están guardados en:</p>
+        <code class="block bg-zinc-50 border border-zinc-200 rounded-lg p-2 font-mono text-[11px] text-zinc-800 break-all select-all">d:\gest. proyec\app\test-assets\barcodes\</code>
+      </div>
+
+    </div>
+
+    <!-- Phone Mockup -->
+    <div class="lg:col-span-7 flex justify-center">
+      <div class="w-[365px] h-[730px] bg-zinc-900 rounded-[48px] p-3 shadow-2xl border-4 border-zinc-800 relative flex flex-col overflow-hidden">
+
+        <!-- Dynamic Island -->
+        <div class="absolute top-3.5 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-full z-50"></div>
+
+        <!-- Phone Screen Container (WHITE BACKGROUND) -->
+        <div class="w-full h-full bg-white rounded-[38px] overflow-hidden flex flex-col text-zinc-900 relative">
+
+          <!-- Phone Status Bar -->
+          <div class="pt-3.5 px-6 pb-2 flex justify-between items-center text-[10px] font-semibold text-zinc-500 z-40 bg-white">
+            <span class="font-mono">20:58</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[9px]">5G</span>
+              <div class="flex items-end gap-0.5 h-3">
+                <div class="w-1 h-1.5 bg-zinc-800 rounded-sm"></div>
+                <div class="w-1 h-2 bg-zinc-800 rounded-sm"></div>
+                <div class="w-1 h-2.5 bg-zinc-800 rounded-sm"></div>
+                <div class="w-1 h-3 bg-zinc-800 rounded-sm"></div>
+              </div>
+              <span class="text-[9px]">100%</span>
+            </div>
+          </div>
+
+          <!-- App Header -->
+          <div class="px-4 py-2.5 border-b border-zinc-200 bg-white flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center text-xs font-bold">FA</div>
+              <div>
+                <div class="font-bold text-xs tracking-tight text-zinc-900 leading-none">FarmaApp</div>
+                <div class="text-[10px] text-zinc-500 font-medium">Botica San Martin</div>
+              </div>
+            </div>
+            <button onclick="navigateTab('cart')" class="relative p-1.5 rounded-lg hover:bg-zinc-100 transition">
+              <svg class="w-5 h-5 text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              <span id="header-badge" class="absolute -top-0.5 -right-0.5 bg-zinc-900 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+            </button>
+          </div>
+
+          <!-- Screen Contents -->
+          <div class="flex-1 overflow-hidden relative bg-zinc-50" id="screens">
+
+            <!-- SCREEN 1: HOME -->
+            <div id="screen-home" class="absolute inset-0 overflow-y-auto p-4 space-y-3 bg-zinc-50">
+              
+              <!-- Greeting Banner -->
+              <div class="bg-zinc-900 text-white rounded-2xl p-4 shadow-sm">
+                <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Atencion al Cliente</div>
+                <div class="text-base font-extrabold mt-0.5">Venta Mostrador</div>
+                <div class="mt-3 pt-2 border-t border-zinc-800 flex justify-between text-[11px]">
+                  <span class="text-zinc-400">Catálogo disponible</span>
+                  <span class="font-bold font-mono text-zinc-100">25 productos</span>
+                </div>
+              </div>
+
+              <!-- Main Action Buttons -->
+              <button onclick="navigateTab('search')" class="w-full bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl p-3.5 flex items-center gap-3 transition text-left shadow-sm">
+                <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <div class="font-bold text-xs text-zinc-900">Buscar Medicamento</div>
+                  <div class="text-[10px] text-zinc-500">Por nombre, principio activo o código</div>
+                </div>
+                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+
+              <button onclick="navigateTab('scan')" class="w-full bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl p-3.5 flex items-center gap-3 transition text-left shadow-sm">
+                <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <div class="font-bold text-xs text-zinc-900">Escanear Código de Barras</div>
+                  <div class="text-[10px] text-zinc-500">Cámara web o archivo PNG</div>
+                </div>
+                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+
+              <button onclick="navigateTab('cart')" class="w-full bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl p-3.5 flex items-center gap-3 transition text-left shadow-sm">
+                <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <div class="font-bold text-xs text-zinc-900">Venta Actual <span id="home-badge" class="ml-1 text-[10px] font-mono font-semibold bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded text-zinc-800">0 items</span></div>
+                  <div class="text-[10px] text-zinc-500 font-medium" id="home-total">Total: S/ 0.00</div>
+                </div>
+                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+
+              <!-- Database pill -->
+              <div class="p-3 bg-white border border-zinc-200 rounded-xl flex items-center justify-between text-[11px] shadow-sm">
+                <span class="text-zinc-600 font-medium">Función RPC Atómica</span>
+                <span class="flex items-center gap-1.5 font-mono text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                  registrar_venta_atomica
+                </span>
+              </div>
+            </div>
+
+            <!-- SCREEN 2: SEARCH -->
+            <div id="screen-search" class="absolute inset-0 overflow-y-auto p-3 space-y-2.5 hidden bg-zinc-50">
+              <div class="relative">
+                <input id="search-input" type="text" oninput="handleSearch(this.value)" placeholder="Buscar medicamento o código..." class="w-full bg-white border border-zinc-300 text-zinc-900 text-xs rounded-xl pl-9 pr-8 py-2.5 focus:outline-none focus:border-zinc-800 shadow-sm placeholder:text-zinc-400">
+                <svg class="w-4 h-4 text-zinc-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <button onclick="clearSearch()" class="absolute right-3 top-2.5 text-zinc-400 hover:text-zinc-800 text-sm font-bold">×</button>
+              </div>
+
+              <!-- Categories -->
+              <div class="flex gap-1.5 overflow-x-auto pb-1">
+                <button onclick="filterCat('ALL', this)" class="cat-pill px-3 py-1 rounded-full text-[11px] font-semibold bg-zinc-900 text-white whitespace-nowrap">Todos</button>
+                <button onclick="filterCat('Analgesicos', this)" class="cat-pill px-3 py-1 rounded-full text-[11px] font-medium bg-white border border-zinc-200 text-zinc-700 hover:border-zinc-400 whitespace-nowrap">Analgésicos</button>
+                <button onclick="filterCat('Antibioticos', this)" class="cat-pill px-3 py-1 rounded-full text-[11px] font-medium bg-white border border-zinc-200 text-zinc-700 hover:border-zinc-400 whitespace-nowrap">Antibióticos</button>
+                <button onclick="filterCat('Primeros Auxilios', this)" class="cat-pill px-3 py-1 rounded-full text-[11px] font-medium bg-white border border-zinc-200 text-zinc-700 hover:border-zinc-400 whitespace-nowrap">Auxilios</button>
+                <button onclick="filterCat('Cuidado Personal', this)" class="cat-pill px-3 py-1 rounded-full text-[11px] font-medium bg-white border border-zinc-200 text-zinc-700 hover:border-zinc-400 whitespace-nowrap">Cuidado</button>
+              </div>
+
+              <div class="space-y-2 pb-16" id="product-list"></div>
+            </div>
+
+            <!-- SCREEN 3: SCAN (WEBCAM & BARCODE) -->
+            <div id="screen-scan" class="absolute inset-0 flex flex-col bg-zinc-950 text-white hidden">
+              <div class="flex-1 flex flex-col items-center justify-center p-3 gap-2.5">
+                <div class="flex items-center justify-between w-full px-2 text-[11px] text-zinc-300">
+                  <span id="cam-status">Cámara inactiva</span>
+                  <span id="cam-indicator" class="w-2.5 h-2.5 rounded-full bg-zinc-600"></span>
+                </div>
+
+                <!-- Video Viewfinder Frame -->
+                <div class="relative w-64 h-52 rounded-2xl border-2 border-zinc-700 overflow-hidden flex items-center justify-center bg-black shadow-inner">
+                  
+                  <!-- Live Webcam Video -->
+                  <video id="webcam-video" playsinline autoplay muted class="absolute inset-0 w-full h-full object-cover hidden"></video>
+
+                  <!-- Placeholder when camera is off -->
+                  <div id="webcam-placeholder" class="text-center p-4 z-10 flex flex-col items-center">
+                    <svg class="w-10 h-10 text-zinc-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    <div class="text-xs font-bold text-zinc-200">Cámara Web Apagada</div>
+                    <div class="text-[10px] text-zinc-400 mt-1 max-w-[200px] leading-tight">Presiona el botón de abajo para activar tu cámara web y escanear</div>
+                  </div>
+
+                  <!-- Viewfinder Laser Line -->
+                  <div id="scan-laser" class="scan-line absolute left-3 right-3 h-0.5 bg-emerald-400 shadow-[0_0_8px_#34d399] z-20 hidden"></div>
+
+                  <!-- Frame Corner Accents -->
+                  <div class="absolute top-2.5 left-2.5 w-4 h-4 border-t-2 border-l-2 border-white rounded-tl-sm pointer-events-none z-20"></div>
+                  <div class="absolute top-2.5 right-2.5 w-4 h-4 border-t-2 border-r-2 border-white rounded-tr-sm pointer-events-none z-20"></div>
+                  <div class="absolute bottom-2.5 left-2.5 w-4 h-4 border-b-2 border-l-2 border-white rounded-bl-sm pointer-events-none z-20"></div>
+                  <div class="absolute bottom-2.5 right-2.5 w-4 h-4 border-b-2 border-r-2 border-white rounded-br-sm pointer-events-none z-20"></div>
+                </div>
+
+                <!-- Camera Controls -->
+                <div class="flex items-center gap-2 mt-1">
+                  <button id="btn-toggle-cam" onclick="toggleWebcam()" class="bg-white hover:bg-zinc-200 text-black px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span id="btn-toggle-cam-text">Iniciar Cámara Web</span>
+                  </button>
+                  <label class="cursor-pointer bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <span>Subir PNG</span>
+                    <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                  </label>
+                </div>
+              </div>
+
+              <!-- Manual code input fallback -->
+              <div class="bg-zinc-900 border-t border-zinc-800 p-3.5 space-y-2 rounded-t-2xl">
+                <div class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold">O ingresar código manualmente:</div>
+                <div class="flex gap-2">
+                  <input id="scan-input" type="text" placeholder="BOT-000001" class="flex-1 bg-zinc-800 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs font-mono uppercase focus:outline-none focus:border-zinc-400 placeholder:text-zinc-600">
+                  <button onclick="doScan()" class="bg-zinc-100 hover:bg-white text-black px-4 py-2 rounded-xl text-xs font-bold">Buscar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- SCREEN 4: CART -->
+            <div id="screen-cart" class="absolute inset-0 flex flex-col p-3.5 hidden bg-zinc-50">
+              <div class="flex items-center justify-between pb-2.5 border-b border-zinc-200 mb-2">
+                <span class="font-bold text-xs text-zinc-900">Venta en curso</span>
+                <button onclick="clearCart()" class="text-[10px] text-zinc-600 hover:text-red-600 border border-zinc-300 px-2 py-0.5 rounded transition">Vaciar</button>
+              </div>
+
+              <div class="flex-1 overflow-y-auto space-y-2 pb-2" id="cart-list"></div>
+
+              <!-- Payment & Checkout -->
+              <div class="bg-white border border-zinc-200 rounded-2xl p-3.5 space-y-3 mt-1 shadow-sm">
+                <div>
+                  <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Método de pago</div>
+                  <div class="grid grid-cols-4 gap-1">
+                    <button onclick="selectPay(this,'EFECTIVO')" class="pay-btn py-1.5 rounded-lg border bg-zinc-900 text-white border-zinc-900 text-[10px] font-bold text-center">Efectivo</button>
+                    <button onclick="selectPay(this,'YAPE')" class="pay-btn py-1.5 rounded-lg border border-zinc-300 text-zinc-700 text-[10px] font-medium text-center hover:border-zinc-400">Yape</button>
+                    <button onclick="selectPay(this,'PLIN')" class="pay-btn py-1.5 rounded-lg border border-zinc-300 text-zinc-700 text-[10px] font-medium text-center hover:border-zinc-400">Plin</button>
+                    <button onclick="selectPay(this,'TARJETA')" class="pay-btn py-1.5 rounded-lg border border-zinc-300 text-zinc-700 text-[10px] font-medium text-center hover:border-zinc-400">Tarjeta</button>
+                  </div>
+                </div>
+
+                <div class="space-y-1 text-xs">
+                  <div class="flex justify-between text-zinc-500">
+                    <span>Subtotal</span><span id="c-sub" class="font-mono">S/ 0.00</span>
+                  </div>
+                  <div class="flex justify-between text-zinc-500">
+                    <span>IGV (18% incl.)</span><span id="c-igv" class="font-mono">S/ 0.00</span>
+                  </div>
+                  <div class="flex justify-between font-extrabold text-sm text-zinc-900 pt-1.5 border-t border-zinc-200">
+                    <span>Total a cobrar</span><span id="c-total" class="font-mono">S/ 0.00</span>
+                  </div>
+                </div>
+
+                <button onclick="confirmSale()" id="confirm-btn" class="w-full bg-zinc-900 hover:bg-black text-white font-bold py-3 rounded-xl text-xs transition disabled:opacity-30 disabled:cursor-not-allowed shadow" disabled>
+                  Confirmar Venta
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Navigation Bar -->
+          <div class="bg-white border-t border-zinc-200 px-4 py-2 flex justify-around items-end pb-3 z-40">
+            <button onclick="navigateTab('home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-zinc-900 font-bold">
+              <svg style="width:19px;height:19px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              <span class="text-[9px]">Inicio</span>
+            </button>
+            <button onclick="navigateTab('search')" id="nav-search" class="flex flex-col items-center gap-0.5 text-zinc-500 hover:text-zinc-900 font-medium">
+              <svg style="width:19px;height:19px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <span class="text-[9px]">Buscar</span>
+            </button>
+            <button onclick="navigateTab('scan')" id="nav-scan" class="flex flex-col items-center gap-0.5 text-zinc-500 hover:text-zinc-900 font-medium">
+              <div class="w-9 h-9 -mt-5 rounded-full bg-zinc-900 flex items-center justify-center mb-0.5 shadow-md">
+                <svg style="width:16px;height:16px" class="text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+              </div>
+              <span class="text-[9px]">Escanear</span>
+            </button>
+            <button onclick="navigateTab('cart')" id="nav-cart" class="flex flex-col items-center gap-0.5 text-zinc-500 hover:text-zinc-900 relative font-medium">
+              <svg style="width:19px;height:19px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              <span class="text-[9px]">Venta</span>
+              <span id="nav-badge" class="absolute -top-0.5 right-1.5 bg-zinc-900 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">0</span>
+            </button>
+          </div>
+
+          <!-- Toast notification -->
+          <div id="toast" class="absolute top-14 left-4 right-4 bg-zinc-900 text-white py-2.5 px-3.5 rounded-xl text-xs font-semibold z-50 opacity-0 transition-opacity duration-200 pointer-events-none shadow-lg flex items-center gap-2">
+            <span id="toast-text">-</span>
+          </div>
+
+          <!-- Sale Confirmation Modal -->
+          <div id="modal" class="absolute inset-0 bg-black/60 flex items-center justify-center p-5 z-50 hidden backdrop-blur-sm">
+            <div class="bg-white rounded-3xl p-5 w-full space-y-3.5 text-center shadow-2xl">
+              <div class="w-12 h-12 rounded-full bg-emerald-50 border-2 border-emerald-500 flex items-center justify-center mx-auto text-emerald-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              </div>
+              <div>
+                <div class="font-extrabold text-base text-zinc-900">Venta Registrada</div>
+                <div class="text-xs text-zinc-500 mt-0.5">Transacción atómica completada. Stock actualizado en Supabase.</div>
+              </div>
+              <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-left space-y-1.5 text-xs">
+                <div class="flex justify-between">
+                  <span class="text-zinc-500">Código de Venta</span>
+                  <span id="m-code" class="font-mono font-bold text-zinc-900">-</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-zinc-500">Método de Pago</span>
+                  <span id="m-method" class="font-semibold text-zinc-900">-</span>
+                </div>
+                <div class="flex justify-between font-extrabold text-sm text-zinc-900 pt-1.5 border-t border-zinc-200">
+                  <span>Total Cobrado</span>
+                  <span id="m-total" class="font-mono">-</span>
+                </div>
+              </div>
+              <button onclick="closeModal()" class="w-full bg-zinc-900 hover:bg-black text-white font-bold py-2.5 rounded-xl text-xs transition">
+                Nueva Venta
+              </button>
+            </div>
+          </div>
+
+          <!-- Scanned Product Sheet / Modal -->
+          <div id="scan-modal" class="absolute inset-0 bg-black/60 flex items-end justify-center p-3 z-50 hidden backdrop-blur-sm">
+            <div class="bg-white rounded-3xl p-4 w-full space-y-3 text-left shadow-2xl">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Medicamento Detectado</span>
+                <button onclick="closeScanModal()" class="w-6 h-6 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 hover:text-black font-bold text-xs">×</button>
+              </div>
+
+              <!-- Product Photo Container from Supabase Storage -->
+              <div class="w-full h-36 bg-zinc-50 border border-zinc-200 rounded-2xl flex items-center justify-center overflow-hidden p-2">
+                <img id="sm-img" src="" alt="" class="max-h-full max-w-full object-contain">
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between gap-2">
+                  <span id="sm-cat" class="text-[10px] uppercase font-bold text-zinc-400">CATEGORIA</span>
+                  <span id="sm-stock" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Stock: 50</span>
+                </div>
+                <div id="sm-name" class="font-extrabold text-sm text-zinc-900 mt-1 leading-snug">Nombre</div>
+                <div class="flex items-center gap-1.5 text-[11px] text-zinc-500 font-mono mt-0.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                  <span id="sm-code">BOT-000001</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2">
+                <span class="text-xs text-zinc-500 font-medium">Precio Unitario</span>
+                <span id="sm-price" class="font-mono font-extrabold text-base text-zinc-900">S/ 0.00</span>
+              </div>
+
+              <div class="flex gap-2 pt-1">
+                <button onclick="closeScanModal()" class="flex-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold py-2.5 rounded-xl text-xs transition">
+                  Cerrar
+                </button>
+                <button id="sm-add-btn" onclick="addScannedToCart()" class="flex-1 bg-zinc-900 hover:bg-black text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                  <span>+ Agregar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_STORAGE_URL = 'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/';
+    const RAW_PRODUCTS = [
+      {id:1,cat:'Analgesicos',code:'BOT-000001',name:'Paracetamol 500 mg (Caja x 100)',price:15.50,stock:60,min:10},
+      {id:2,cat:'Analgesicos',code:'BOT-000002',name:'Ibuprofeno 400 mg (Caja x 20)',price:12.00,stock:45,min:8},
+      {id:3,cat:'Analgesicos',code:'BOT-000003',name:'Naproxeno Sodico 550 mg (Caja x 10)',price:18.00,stock:35,min:5},
+      {id:4,cat:'Analgesicos',code:'BOT-000004',name:'Panadol Antigripal NF (Caja x 24)',price:22.50,stock:50,min:10},
+      {id:5,cat:'Analgesicos',code:'BOT-000005',name:'Clonixinato de Lisina 125 mg (x 10)',price:28.00,stock:30,min:5},
+      {id:6,cat:'Antibioticos',code:'BOT-000006',name:'Amoxicilina 500 mg (Caja x 50)',price:32.00,stock:40,min:10},
+      {id:7,cat:'Antibioticos',code:'BOT-000007',name:'Azitromicina 500 mg (Caja x 3)',price:25.00,stock:45,min:10},
+      {id:8,cat:'Antibioticos',code:'BOT-000008',name:'Ciprofloxacino 500 mg (Caja x 10)',price:20.00,stock:30,min:5},
+      {id:9,cat:'Antibioticos',code:'BOT-000009',name:'Cefalexina 500 mg (Caja x 20)',price:24.50,stock:25,min:5},
+      {id:10,cat:'Antibioticos',code:'BOT-000010',name:'Claritromicina 500 mg (Caja x 10)',price:38.00,stock:20,min:5},
+      {id:11,cat:'Antihistaminicos',code:'BOT-000011',name:'Cetirizina 10 mg (Caja x 10)',price:10.00,stock:70,min:15},
+      {id:12,cat:'Antihistaminicos',code:'BOT-000012',name:'Loratadina 10 mg (Caja x 10)',price:9.50,stock:65,min:15},
+      {id:13,cat:'Antihistaminicos',code:'BOT-000013',name:'Clorfenamina Maleato 4 mg (x 100)',price:12.00,stock:80,min:20},
+      {id:14,cat:'Antihistaminicos',code:'BOT-000014',name:'Levocetirizina 5 mg (Caja x 10)',price:26.00,stock:40,min:10},
+      {id:15,cat:'Antihistaminicos',code:'BOT-000015',name:'Desloratadina 5 mg (Caja x 10)',price:34.00,stock:35,min:8},
+      {id:16,cat:'Primeros Auxilios',code:'BOT-000016',name:'Alcohol Etilico 70 (Frasco x 1000 ml)',price:8.50,stock:50,min:10},
+      {id:17,cat:'Primeros Auxilios',code:'BOT-000017',name:'Agua Oxigenada 10 Vol. (Frasco x 250 ml)',price:4.50,stock:40,min:10},
+      {id:18,cat:'Primeros Auxilios',code:'BOT-000018',name:'Algodon Hidrofilo Premium (x 100 g)',price:5.00,stock:55,min:15},
+      {id:19,cat:'Primeros Auxilios',code:'BOT-000019',name:'Gasas Esteriles 10x10 cm (Sobre x 5)',price:6.50,stock:100,min:25},
+      {id:20,cat:'Primeros Auxilios',code:'BOT-000020',name:'Venda Elastica 4 pulg. (Rollo x 5 yardas)',price:7.00,stock:40,min:10},
+      {id:21,cat:'Cuidado Personal',code:'BOT-000021',name:'Bloqueador Solar SPF 50 (Frasco x 120 ml)',price:45.00,stock:25,min:5},
+      {id:22,cat:'Cuidado Personal',code:'BOT-000022',name:'Jabon Liquido Antibacterial (x 400 ml)',price:14.00,stock:30,min:8},
+      {id:23,cat:'Cuidado Personal',code:'BOT-000023',name:'Termometro Digital Clinico (Unidad)',price:22.00,stock:20,min:5},
+      {id:24,cat:'Cuidado Personal',code:'BOT-000024',name:'Gel Antibacterial 70% (Frasco x 500 ml)',price:9.00,stock:45,min:10},
+      {id:25,cat:'Cuidado Personal',code:'BOT-000025',name:'Cepillo Dental Ortodoncia Suave (Unidad)',price:8.00,stock:60,min:15},
+    ];
+    const PRODUCTS = RAW_PRODUCTS.map(p => ({
+      ...p,
+      img: `${SUPABASE_STORAGE_URL}${p.code}.jpg`
+    }));
+
+    let products = JSON.parse(JSON.stringify(PRODUCTS));
+    let cart = [];
+    let salesCount = 0;
+    let revenue = 0;
+    let selectedPay = 'EFECTIVO';
+    let filterCatActive = 'ALL';
+    let searchQ = '';
+
+    // Webcam & Barcode detection state
+    let codeReader = null;
+    let webcamActive = false;
+    let lastScannedCode = null;
+    let lastScanTime = 0;
+
+    function init() {
+      renderQuickList();
+      renderProductList();
+      renderCart();
+      checkBarcodeSupport();
+    }
+
+    function checkBarcodeSupport() {
+      const badge = document.getElementById('barcode-api-badge');
+      if (typeof ZXing !== 'undefined') {
+        badge.textContent = 'Motor ZXing Activo (Code128)';
+        badge.className = 'text-xs font-mono px-3 py-1 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-700 shadow-sm font-semibold';
+      } else if ('BarcodeDetector' in window) {
+        badge.textContent = 'BarcodeDetector Nativo';
+        badge.className = 'text-xs font-mono px-3 py-1 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-700 shadow-sm font-semibold';
+      } else {
+        badge.textContent = 'Cámara Web Lista';
+      }
+    }
+
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1400, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } catch(e) {}
+    }
+
+    async function toggleWebcam() {
+      if (webcamActive) {
+        stopWebcam();
+      } else {
+        await startWebcam();
+      }
+    }
+
+    async function startWebcam() {
+      const video = document.getElementById('webcam-video');
+      const placeholder = document.getElementById('webcam-placeholder');
+      const laser = document.getElementById('scan-laser');
+      const statusText = document.getElementById('cam-status');
+      const indicator = document.getElementById('cam-indicator');
+      const btnText = document.getElementById('btn-toggle-cam-text');
+
+      try {
+        statusText.textContent = 'Iniciando escáner ZXing...';
+
+        if (typeof ZXing !== 'undefined') {
+          if (!codeReader) {
+            codeReader = new ZXing.BrowserMultiFormatReader();
+          }
+
+          // decodeFromVideoDevice handles camera stream & continuous decode at full framerate
+          await codeReader.decodeFromVideoDevice(undefined, 'webcam-video', (result, err) => {
+            if (result) {
+              const rawVal = result.getText().trim();
+              const now = Date.now();
+              if (rawVal !== lastScannedCode || now - lastScanTime > 3000) {
+                lastScannedCode = rawVal;
+                lastScanTime = now;
+                playBeep();
+                simulateScan(rawVal);
+              }
+            }
+          });
+
+          webcamActive = true;
+          video.classList.remove('hidden');
+          placeholder.classList.add('hidden');
+          laser.classList.remove('hidden');
+
+          statusText.textContent = 'Escaneando en vivo · ZXing Activo';
+          indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
+          btnText.textContent = 'Detener Cámara';
+          showToast('Cámara y escáner ZXing activos');
+        } else {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+          });
+          video.srcObject = stream;
+          await video.play();
+          webcamActive = true;
+          video.classList.remove('hidden');
+          placeholder.classList.add('hidden');
+          laser.classList.remove('hidden');
+          statusText.textContent = 'Cámara en vivo activa';
+          indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
+          btnText.textContent = 'Detener Cámara';
+        }
+      } catch (err) {
+        console.error('Error al acceder a la cámara:', err);
+        statusText.textContent = 'Sin acceso a cámara';
+        indicator.className = 'w-2.5 h-2.5 rounded-full bg-red-500';
+        showToast('Error al iniciar: ' + (err.message || 'Sin permisos'));
+      }
+    }
+
+    function stopWebcam() {
+      webcamActive = false;
+      if (codeReader) {
+        try { codeReader.reset(); } catch(e) {}
+      }
+
+      const video = document.getElementById('webcam-video');
+      if (video.srcObject) {
+        video.srcObject.getTracks().forEach(t => t.stop());
+        video.srcObject = null;
+      }
+
+      const placeholder = document.getElementById('webcam-placeholder');
+      const laser = document.getElementById('scan-laser');
+      const statusText = document.getElementById('cam-status');
+      const indicator = document.getElementById('cam-indicator');
+      const btnText = document.getElementById('btn-toggle-cam-text');
+
+      video.classList.add('hidden');
+      placeholder.classList.remove('hidden');
+      laser.classList.add('hidden');
+
+      statusText.textContent = 'Cámara inactiva';
+      indicator.className = 'w-2.5 h-2.5 rounded-full bg-zinc-600';
+      btnText.textContent = 'Iniciar Cámara Web';
+    }
+
+    async function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = async () => {
+        if (typeof ZXing !== 'undefined') {
+          try {
+            if (!codeReader) codeReader = new ZXing.BrowserMultiFormatReader();
+            const result = await codeReader.decodeFromImageElement(img);
+            if (result) {
+              playBeep();
+              simulateScan(result.getText());
+              return;
+            }
+          } catch(err) {
+            console.warn('ZXing image decode:', err);
+          }
+        }
+        const nameMatch = file.name.match(/BOT-\d{6}/i);
+        if (nameMatch) {
+          playBeep();
+          simulateScan(nameMatch[0]);
+        } else {
+          showToast('Código no detectado en la imagen');
+        }
+      };
+    }
+
+    function renderQuickList() {
+      document.getElementById('quick-list').innerHTML = products.map(p => `
+        <div onclick="simulateScan('${p.code}')" class="flex items-center justify-between px-2.5 py-1.5 rounded-xl hover:bg-zinc-50 cursor-pointer group transition border border-transparent hover:border-zinc-200 gap-2.5">
+          <img src="${p.img}" alt="${p.name}" class="w-8 h-8 rounded-lg object-contain bg-zinc-50 border border-zinc-200 shrink-0" onerror="this.src='/barcodes/${p.code}.png'">
+          <div class="overflow-hidden flex-1">
+            <div class="text-xs font-semibold text-zinc-900 group-hover:text-black truncate">${p.name}</div>
+            <div class="text-[10px] font-mono text-zinc-500">${p.code} · Stock: ${p.stock}</div>
+          </div>
+          <div class="text-xs font-mono font-bold text-zinc-900 shrink-0 ml-1">S/ ${p.price.toFixed(2)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderProductList() {
+      const el = document.getElementById('product-list');
+      const filtered = products.filter(p => {
+        const matchCat = filterCatActive === 'ALL' || p.cat === filterCatActive;
+        const q = searchQ.toLowerCase();
+        const matchQ = p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q);
+        return matchCat && matchQ;
+      });
+
+      if (!filtered.length) {
+        el.innerHTML = `<div class="text-center py-10 text-xs text-zinc-500 font-medium">Sin resultados para "${searchQ}"</div>`;
+        return;
+      }
+
+      el.innerHTML = filtered.map(p => {
+        const stockState = p.stock === 0 ? 'agotado' : p.stock <= p.min ? 'bajo' : 'ok';
+        const stockLabel = {ok:'Disponible', bajo:`Bajo (${p.stock})`, agotado:'Agotado'}[stockState];
+        const stockColor = {ok:'text-emerald-700 bg-emerald-50 border border-emerald-200', bajo:'text-amber-700 bg-amber-50 border border-amber-200', agotado:'text-red-700 bg-red-50 border border-red-200'}[stockState];
+        return `
+          <div class="p-3 bg-white border border-zinc-200 rounded-2xl flex items-center justify-between shadow-sm gap-2.5">
+            <img src="${p.img}" alt="${p.name}" class="w-14 h-14 rounded-xl object-contain bg-zinc-50 border border-zinc-200 p-1 shrink-0" onerror="this.src='/barcodes/${p.code}.png'">
+            <div class="flex-1 mr-1 overflow-hidden">
+              <div class="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">${p.cat}</div>
+              <div class="text-xs font-bold text-zinc-900 leading-tight truncate">${p.name}</div>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-xs font-mono font-extrabold text-zinc-900">S/ ${p.price.toFixed(2)}</span>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${stockColor}">${stockLabel}</span>
+              </div>
+            </div>
+            <button onclick="addToCart(${p.id})" ${p.stock===0?'disabled':''} class="w-8 h-8 rounded-xl border ${p.stock===0?'border-zinc-200 text-zinc-400 cursor-not-allowed':'border-zinc-900 bg-zinc-900 text-white hover:bg-black'} flex items-center justify-center text-base font-bold transition shadow-sm shrink-0">+</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderCart() {
+      const total = cart.reduce((s, i) => s + i.sub, 0);
+      const igv = total * 0.18 / 1.18;
+      const sub = total - igv;
+      const count = cart.reduce((s, i) => s + i.qty, 0);
+
+      document.getElementById('header-badge').textContent = count;
+      document.getElementById('nav-badge').textContent = count;
+      document.getElementById('home-badge').textContent = `${count} items`;
+      document.getElementById('home-total').textContent = `Total: S/ ${total.toFixed(2)}`;
+      document.getElementById('c-sub').textContent = `S/ ${sub.toFixed(2)}`;
+      document.getElementById('c-igv').textContent = `S/ ${igv.toFixed(2)}`;
+      document.getElementById('c-total').textContent = `S/ ${total.toFixed(2)}`;
+
+      const btn = document.getElementById('confirm-btn');
+      btn.disabled = cart.length === 0;
+
+      const el = document.getElementById('cart-list');
+      if (!cart.length) {
+        el.innerHTML = `<div class="text-center py-12 text-xs text-zinc-500 font-medium">El carrito está vacío.<br>Busca o escanea un medicamento.</div>`;
+        return;
+      }
+
+      el.innerHTML = cart.map(item => `
+        <div class="p-3 bg-white border border-zinc-200 rounded-2xl flex items-center gap-2.5 shadow-sm">
+          <img src="${item.img || ''}" alt="${item.name}" class="w-11 h-11 rounded-lg object-contain bg-zinc-50 border border-zinc-200 shrink-0" onerror="this.style.display='none'">
+          <div class="flex-1 overflow-hidden">
+            <div class="text-xs font-bold text-zinc-900 leading-tight truncate">${item.name}</div>
+            <div class="text-[10px] text-zinc-500 font-mono mt-0.5">S/ ${item.price.toFixed(2)} c/u · Sub: S/ ${item.sub.toFixed(2)}</div>
+          </div>
+          <div class="flex items-center border border-zinc-300 rounded-lg overflow-hidden shrink-0">
+            <button onclick="changeQty(${item.id},-1)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-zinc-800 hover:bg-zinc-100">-</button>
+            <span class="w-6 text-center text-xs font-mono font-bold text-zinc-900">${item.qty}</span>
+            <button onclick="changeQty(${item.id},1)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-zinc-800 hover:bg-zinc-100">+</button>
+          </div>
+          <button onclick="removeItem(${item.id})" class="w-6 h-6 flex items-center justify-center text-zinc-400 hover:text-red-600 text-sm font-bold shrink-0">×</button>
+        </div>
+      `).join('');
+    }
+
+    function addToCart(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      const ex = cart.find(x => x.id === id);
+      if (ex) {
+        if (ex.qty >= p.stock) { showToast(`Stock máximo: ${p.stock}`); return; }
+        ex.qty++; ex.sub = +(ex.qty * ex.price).toFixed(2);
+      } else {
+        if (p.stock < 1) { showToast('Sin stock disponible'); return; }
+        cart.push({ id: p.id, name: p.name, price: p.price, qty: 1, sub: p.price, img: p.img, code: p.code });
+      }
+      showToast(`✓ Agregado: ${p.name}`);
+      renderCart();
+    }
+
+    function changeQty(id, d) {
+      const item = cart.find(x => x.id === id);
+      if (!item) return;
+      const p = products.find(x => x.id === id);
+      const newQ = item.qty + d;
+      if (newQ <= 0) { removeItem(id); return; }
+      if (newQ > p.stock) { showToast(`Stock disponible: ${p.stock}`); return; }
+      item.qty = newQ;
+      item.sub = +(newQ * item.price).toFixed(2);
+      renderCart();
+    }
+
+    function removeItem(id) {
+      cart = cart.filter(x => x.id !== id);
+      renderCart();
+    }
+
+    function clearCart() {
+      cart = [];
+      renderCart();
+    }
+
+    function selectPay(btn, method) {
+      selectedPay = method;
+      document.querySelectorAll('.pay-btn').forEach(b => {
+        b.className = 'pay-btn py-1.5 rounded-lg border border-zinc-300 text-zinc-700 text-[10px] font-medium text-center hover:border-zinc-400';
+      });
+      btn.className = 'pay-btn py-1.5 rounded-lg border bg-zinc-900 text-white border-zinc-900 text-[10px] font-bold text-center';
+    }
+
+    function confirmSale() {
+      if (!cart.length) return;
+      for (const item of cart) {
+        const p = products.find(x => x.id === item.id);
+        if (!p || p.stock < item.qty) { showToast(`Stock insuficiente: ${item.name}`); return; }
+      }
+      const total = cart.reduce((s, i) => s + i.sub, 0);
+      cart.forEach(item => {
+        const p = products.find(x => x.id === item.id);
+        if (p) p.stock -= item.qty;
+      });
+      salesCount++;
+      revenue += total;
+      const code = `VTA-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${String(salesCount).padStart(4,'0')}`;
+      document.getElementById('m-code').textContent = code;
+      document.getElementById('m-method').textContent = selectedPay;
+      document.getElementById('m-total').textContent = `S/ ${total.toFixed(2)}`;
+      document.getElementById('modal').classList.remove('hidden');
+      cart = [];
+      renderCart();
+      renderProductList();
+      renderQuickList();
+      document.getElementById('stat-sales').textContent = salesCount;
+      document.getElementById('stat-revenue').textContent = `S/ ${revenue.toFixed(2)}`;
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+      navigateTab('home');
+    }
+
+    let currentScannedProd = null;
+    function showScanModal(p) {
+      currentScannedProd = p;
+      document.getElementById('sm-img').src = p.img;
+      document.getElementById('sm-cat').textContent = p.cat;
+      document.getElementById('sm-name').textContent = p.name;
+      document.getElementById('sm-code').textContent = p.code;
+      document.getElementById('sm-price').textContent = `S/ ${p.price.toFixed(2)}`;
+      
+      const stockEl = document.getElementById('sm-stock');
+      const addBtn = document.getElementById('sm-add-btn');
+      if (p.stock <= 0) {
+        stockEl.textContent = 'Agotado';
+        stockEl.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200';
+        addBtn.disabled = true;
+        addBtn.className = 'flex-1 bg-zinc-300 text-zinc-500 font-bold py-2.5 rounded-xl text-xs cursor-not-allowed';
+      } else {
+        stockEl.textContent = `Stock: ${p.stock}`;
+        stockEl.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+        addBtn.disabled = false;
+        addBtn.className = 'flex-1 bg-zinc-900 hover:bg-black text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5';
+      }
+      document.getElementById('scan-modal').classList.remove('hidden');
+    }
+
+    function closeScanModal() {
+      document.getElementById('scan-modal').classList.add('hidden');
+      currentScannedProd = null;
+    }
+
+    function addScannedToCart() {
+      if (currentScannedProd) {
+        addToCart(currentScannedProd.id);
+        closeScanModal();
+        navigateTab('cart');
+      }
+    }
+
+    function simulateScan(code) {
+      const cleanCode = code.trim().toUpperCase();
+      const p = products.find(x => x.code === cleanCode);
+      if (!p) { showToast(`Código no registrado: ${cleanCode}`); return; }
+      showScanModal(p);
+    }
+
+    function doScan() {
+      const val = document.getElementById('scan-input').value;
+      if (!val) return;
+      simulateScan(val);
+      document.getElementById('scan-input').value = '';
+    }
+
+    function handleSearch(v) { searchQ = v; renderProductList(); }
+    function clearSearch() { document.getElementById('search-input').value=''; searchQ=''; renderProductList(); }
+
+    function filterCat(cat, btn) {
+      filterCatActive = cat;
+      document.querySelectorAll('.cat-pill').forEach(b => {
+        b.className = 'cat-pill px-3 py-1 rounded-full text-[11px] font-medium bg-white border border-zinc-200 text-zinc-700 hover:border-zinc-400 whitespace-nowrap';
+      });
+      btn.className = 'cat-pill px-3 py-1 rounded-full text-[11px] font-semibold bg-zinc-900 text-white whitespace-nowrap';
+      renderProductList();
+    }
+
+    function navigateTab(tab) {
+      ['home','search','scan','cart'].forEach(t => {
+        document.getElementById(`screen-${t}`).classList.add('hidden');
+        const n = document.getElementById(`nav-${t}`);
+        if (n) { n.classList.remove('text-zinc-900', 'font-bold'); n.classList.add('text-zinc-500', 'font-medium'); }
+      });
+      document.getElementById(`screen-${tab}`).classList.remove('hidden');
+      const activeNav = document.getElementById(`nav-${tab}`);
+      if (activeNav) { activeNav.classList.remove('text-zinc-500', 'font-medium'); activeNav.classList.add('text-zinc-900', 'font-bold'); }
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = msg;
+      t.classList.remove('opacity-0'); t.classList.add('opacity-100');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { t.classList.remove('opacity-100'); t.classList.add('opacity-0'); }, 2500);
+    }
+
+    function resetDatabase() {
+      products = JSON.parse(JSON.stringify(PRODUCTS));
+      cart = []; salesCount = 0; revenue = 0;
+      init();
+      document.getElementById('stat-sales').textContent = 0;
+      document.getElementById('stat-revenue').textContent = 'S/ 0.00';
+      showToast('Catálogo restablecido');
+    }
+
+    init();
+  </script>
+</body>
+</html>

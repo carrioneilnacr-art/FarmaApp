@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
   Vibration,
+  Image,
 } from 'react-native';
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import { useRouter } from 'expo-router';
@@ -189,6 +190,16 @@ export default function EscanearScreen() {
               </View>
             ) : scannedProduct ? (
               <View style={styles.productDetails}>
+                {scannedProduct.imagen_url ? (
+                  <View style={styles.modalImageContainer}>
+                    <Image
+                      source={{ uri: scannedProduct.imagen_url }}
+                      style={styles.modalImage}
+                      resizeMode="contain"
+                    />
+                  </View>
+                ) : null}
+
                 <View style={styles.productBadgeRow}>
                   {scannedProduct.categorias && (
                     <View style={styles.categoryPill}>
@@ -371,6 +382,21 @@ const styles = StyleSheet.create({
   },
   productDetails: {
     gap: 10,
+  },
+  modalImageContainer: {
+    width: '100%',
+    height: 140,
+    borderRadius: 12,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  modalImage: {
+    width: '100%',
+    height: '100%',
   },
   productBadgeRow: {
     flexDirection: 'row',

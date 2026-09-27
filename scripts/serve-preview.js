@@ -2,7 +2,9 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const HTML_SIMULATOR_PATH = path.join('C:', 'Users', 'Leonardo', '.gemini', 'antigravity', 'brain', '4433aaf8-f04c-4c39-94f2-aa731d95ce9a', 'farmapp_mobile_interactive_preview.html');
+const LOCAL_PREVIEW = path.join(__dirname, '..', 'preview.html');
+const ARTIFACT_PREVIEW = path.join('C:', 'Users', 'Leonardo', '.gemini', 'antigravity', 'brain', '4433aaf8-f04c-4c39-94f2-aa731d95ce9a', 'farmapp_mobile_interactive_preview.html');
+const HTML_SIMULATOR_PATH = fs.existsSync(LOCAL_PREVIEW) ? LOCAL_PREVIEW : ARTIFACT_PREVIEW;
 const BARCODES_DIR = path.join(__dirname, '..', 'test-assets', 'barcodes');
 const ZXING_PATH = path.join(__dirname, '..', 'node_modules', '@zxing', 'library', 'umd', 'index.min.js');
 
@@ -42,7 +44,16 @@ function generateBarcodeGalleryHtml() {
         <span>${p.cat}</span>
         <span class="font-bold text-zinc-900">${p.price}</span>
       </div>
-      <div class="font-bold text-sm text-zinc-900 leading-snug px-2">${p.name}</div>
+
+      <!-- Real Product Photo & Info -->
+      <div class="w-full flex items-center gap-3 bg-zinc-50 p-2.5 rounded-xl border border-zinc-200/80 text-left">
+        <img src="https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/${p.code}.jpg" alt="${p.name}" class="w-14 h-14 object-contain rounded-lg bg-white border border-zinc-200 shrink-0" onerror="this.src='/barcodes/${p.code}.png'">
+        <div class="flex-1 overflow-hidden">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">${p.cat}</div>
+          <div class="font-bold text-xs text-zinc-900 leading-snug truncate">${p.name}</div>
+          <div class="text-xs font-mono font-extrabold text-zinc-900 mt-0.5">${p.price}</div>
+        </div>
+      </div>
       
       <!-- Big barcode image on bright white background -->
       <div class="bg-white border-2 border-zinc-300 rounded-xl p-3 w-full flex items-center justify-center shadow-inner">
