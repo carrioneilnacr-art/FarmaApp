@@ -18,6 +18,8 @@ web-build/
 # Native Android / iOS build outputs
 android/
 ios/
+*.apk
+*.aab
 *.orig.*
 *.jks
 *.p8
