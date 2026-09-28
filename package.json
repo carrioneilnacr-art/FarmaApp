@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "build:apk": "node scripts/build-apk.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
