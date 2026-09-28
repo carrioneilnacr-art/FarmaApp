@@ -258,54 +258,102 @@
             </div>
 
             <!-- SCREEN 3: SCAN (WEBCAM & BARCODE) -->
-            <div id="screen-scan" class="absolute inset-0 flex flex-col bg-zinc-950 text-white hidden">
-              <div class="flex-1 flex flex-col items-center justify-center p-3 gap-2.5">
+            <div id="screen-scan" class="absolute inset-0 flex flex-col bg-zinc-950 text-white hidden overflow-y-auto">
+              <div class="flex-1 flex flex-col items-center justify-start p-3 gap-2">
                 <div class="flex items-center justify-between w-full px-2 text-[11px] text-zinc-300">
-                  <span id="cam-status">Cámara inactiva</span>
-                  <span id="cam-indicator" class="w-2.5 h-2.5 rounded-full bg-zinc-600"></span>
+                  <span id="cam-status">Modo Escáner Óptico</span>
+                  <span id="cam-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 </div>
 
-                <!-- Video Viewfinder Frame -->
-                <div class="relative w-64 h-52 rounded-2xl border-2 border-zinc-700 overflow-hidden flex items-center justify-center bg-black shadow-inner">
+                <!-- Video Viewfinder Frame with Drag & Drop -->
+                <div id="viewfinder-box" ondragover="event.preventDefault(); this.classList.add('border-emerald-400')" ondragleave="this.classList.remove('border-emerald-400')" ondrop="handleDropScan(event)" class="relative w-64 h-48 rounded-2xl border-2 border-zinc-700 overflow-hidden flex items-center justify-center bg-zinc-900 shadow-inner group transition">
                   
                   <!-- Live Webcam Video -->
                   <video id="webcam-video" playsinline autoplay muted class="absolute inset-0 w-full h-full object-cover hidden"></video>
 
-                  <!-- Placeholder when camera is off -->
-                  <div id="webcam-placeholder" class="text-center p-4 z-10 flex flex-col items-center">
-                    <svg class="w-10 h-10 text-zinc-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                    </svg>
-                    <div class="text-xs font-bold text-zinc-200">Cámara Web Apagada</div>
-                    <div class="text-[10px] text-zinc-400 mt-1 max-w-[200px] leading-tight">Presiona el botón de abajo para activar tu cámara web y escanear</div>
+                  <!-- Simulated Camera Viewfinder Grid / Canvas -->
+                  <div id="webcam-placeholder" class="text-center p-3 z-10 flex flex-col items-center w-full">
+                    <div class="w-12 h-12 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center mb-1.5 text-zinc-300">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                    </div>
+                    <div class="text-xs font-bold text-zinc-100">Visor Óptico Activo</div>
+                    <div class="text-[10px] text-zinc-400 mt-0.5 leading-tight">
+                      Toca un código abajo, pega con <kbd class="px-1 py-0.5 bg-zinc-800 rounded text-emerald-400 font-mono">Ctrl+V</kbd> o arrastra un PNG
+                    </div>
                   </div>
 
                   <!-- Viewfinder Laser Line -->
-                  <div id="scan-laser" class="scan-line absolute left-3 right-3 h-0.5 bg-emerald-400 shadow-[0_0_8px_#34d399] z-20 hidden"></div>
+                  <div id="scan-laser" class="scan-line absolute left-3 right-3 h-0.5 bg-emerald-400 shadow-[0_0_8px_#34d399] z-20"></div>
 
                   <!-- Frame Corner Accents -->
-                  <div class="absolute top-2.5 left-2.5 w-4 h-4 border-t-2 border-l-2 border-white rounded-tl-sm pointer-events-none z-20"></div>
-                  <div class="absolute top-2.5 right-2.5 w-4 h-4 border-t-2 border-r-2 border-white rounded-tr-sm pointer-events-none z-20"></div>
-                  <div class="absolute bottom-2.5 left-2.5 w-4 h-4 border-b-2 border-l-2 border-white rounded-bl-sm pointer-events-none z-20"></div>
-                  <div class="absolute bottom-2.5 right-2.5 w-4 h-4 border-b-2 border-r-2 border-white rounded-br-sm pointer-events-none z-20"></div>
+                  <div class="absolute top-2.5 left-2.5 w-4 h-4 border-t-2 border-l-2 border-emerald-400 rounded-tl-sm pointer-events-none z-20"></div>
+                  <div class="absolute top-2.5 right-2.5 w-4 h-4 border-t-2 border-r-2 border-emerald-400 rounded-tr-sm pointer-events-none z-20"></div>
+                  <div class="absolute bottom-2.5 left-2.5 w-4 h-4 border-b-2 border-l-2 border-emerald-400 rounded-bl-sm pointer-events-none z-20"></div>
+                  <div class="absolute bottom-2.5 right-2.5 w-4 h-4 border-b-2 border-r-2 border-emerald-400 rounded-br-sm pointer-events-none z-20"></div>
                 </div>
 
-                <!-- Camera Controls -->
-                <div class="flex items-center gap-2 mt-1">
-                  <button id="btn-toggle-cam" onclick="toggleWebcam()" class="bg-white hover:bg-zinc-200 text-black px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+                <!-- Cámara Virtual: Escaneo Instantáneo al Toque -->
+                <div class="w-full space-y-1 mt-1">
+                  <div class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold flex items-center justify-between px-1">
+                    <span>⚡ Pasar Código por el Lector:</span>
+                    <span class="text-emerald-400 font-mono text-[9px]">Sonido BEEP activo</span>
+                  </div>
+                  <div class="grid grid-cols-2 gap-1.5 text-left">
+                    <button type="button" onclick="simulateScan('BOT-000001')" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/50 transition flex items-center gap-2">
+                      <span class="w-6 h-6 rounded bg-emerald-500/10 text-emerald-400 font-mono font-bold text-[10px] flex items-center justify-center">01</span>
+                      <div class="overflow-hidden flex-1">
+                        <div class="text-[11px] font-bold text-zinc-200 truncate">Paracetamol 500mg</div>
+                        <div class="text-[9px] font-mono text-zinc-500">BOT-000001 · S/ 15.50</div>
+                      </div>
+                    </button>
+                    <button type="button" onclick="simulateScan('BOT-000002')" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/50 transition flex items-center gap-2">
+                      <span class="w-6 h-6 rounded bg-emerald-500/10 text-emerald-400 font-mono font-bold text-[10px] flex items-center justify-center">02</span>
+                      <div class="overflow-hidden flex-1">
+                        <div class="text-[11px] font-bold text-zinc-200 truncate">Ibuprofeno 400mg</div>
+                        <div class="text-[9px] font-mono text-zinc-500">BOT-000002 · S/ 12.00</div>
+                      </div>
+                    </button>
+                    <button type="button" onclick="simulateScan('BOT-000004')" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/50 transition flex items-center gap-2">
+                      <span class="w-6 h-6 rounded bg-emerald-500/10 text-emerald-400 font-mono font-bold text-[10px] flex items-center justify-center">04</span>
+                      <div class="overflow-hidden flex-1">
+                        <div class="text-[11px] font-bold text-zinc-200 truncate">Panadol Antigripal</div>
+                        <div class="text-[9px] font-mono text-zinc-500">BOT-000004 · S/ 22.50</div>
+                      </div>
+                    </button>
+                    <button type="button" onclick="simulateScan('BOT-000016')" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/50 transition flex items-center gap-2">
+                      <span class="w-6 h-6 rounded bg-emerald-500/10 text-emerald-400 font-mono font-bold text-[10px] flex items-center justify-center">16</span>
+                      <div class="overflow-hidden flex-1">
+                        <div class="text-[11px] font-bold text-zinc-200 truncate">Alcohol 70° 250ml</div>
+                        <div class="text-[9px] font-mono text-zinc-500">BOT-000016 · S/ 8.50</div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Camera Controls & Web Notice -->
+                <div class="flex items-center gap-2 mt-1 w-full justify-center">
+                  <button id="btn-toggle-cam" onclick="toggleWebcam()" class="bg-white hover:bg-zinc-200 text-black px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    <span id="btn-toggle-cam-text">Iniciar Cámara Web</span>
+                    <span id="btn-toggle-cam-text">Activar Webcam Física</span>
                   </button>
-                  <label class="cursor-pointer bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
+                  <label class="cursor-pointer bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                     <span>Subir PNG</span>
                     <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
                   </label>
                 </div>
+
+                <!-- Sandbox camera info banner -->
+                <div class="w-full p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400 leading-tight">
+                  <div class="flex items-start gap-1.5">
+                    <span class="text-amber-400 font-bold">ℹ</span>
+                    <span>Los visores internos de editores (Electron / iframes) aíslan la cámara física por seguridad W3C. La <strong>Cámara Virtual</strong> arriba te permite probar el escáner y sonido sin salir de aquí. Si deseas usar tu cámara web física o celular, abre: <a href="http://localhost:3000" target="_blank" class="text-emerald-400 underline font-semibold">http://localhost:3000</a></span>
+                  </div>
+                </div>
               </div>
 
               <!-- Manual code input fallback -->
-              <div class="bg-zinc-900 border-t border-zinc-800 p-3.5 space-y-2 rounded-t-2xl">
+              <div class="bg-zinc-900 border-t border-zinc-800 p-3 space-y-2 rounded-t-2xl">
                 <div class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold">O ingresar código manualmente:</div>
                 <div class="flex gap-2">
                   <input id="scan-input" type="text" placeholder="BOT-000001" class="flex-1 bg-zinc-800 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs font-mono uppercase focus:outline-none focus:border-zinc-400 placeholder:text-zinc-600">
@@ -710,10 +758,10 @@
           btnText.textContent = 'Detener Cámara';
         }
       } catch (err) {
-        console.error('Error al acceder a la cámara:', err);
-        statusText.textContent = 'Sin acceso a cámara';
-        indicator.className = 'w-2.5 h-2.5 rounded-full bg-red-500';
-        showToast('Error al iniciar: ' + (err.message || 'Sin permisos'));
+        console.warn('Cámara física restringida en sandbox iframe:', err);
+        statusText.textContent = 'Cámara Virtual Activa (Simulador)';
+        indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
+        showToast('Cámara virtual activa (visor seguro de editor)');
       }
     }
 
@@ -730,24 +778,27 @@
       }
 
       const placeholder = document.getElementById('webcam-placeholder');
-      const laser = document.getElementById('scan-laser');
       const statusText = document.getElementById('cam-status');
       const indicator = document.getElementById('cam-indicator');
       const btnText = document.getElementById('btn-toggle-cam-text');
 
       video.classList.add('hidden');
       placeholder.classList.remove('hidden');
-      laser.classList.add('hidden');
 
-      statusText.textContent = 'Cámara inactiva';
-      indicator.className = 'w-2.5 h-2.5 rounded-full bg-zinc-600';
-      btnText.textContent = 'Iniciar Cámara Web';
+      statusText.textContent = 'Modo Escáner Óptico';
+      indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+      btnText.textContent = 'Activar Webcam Física';
     }
 
-    async function handleImageUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+    function handleDropScan(e) {
+      e.preventDefault();
+      const box = document.getElementById('viewfinder-box');
+      if (box) box.classList.remove('border-emerald-400');
+      const file = e.dataTransfer.files[0];
+      if (file) handleImageFile(file);
+    }
 
+    function handleImageFile(file) {
       const img = new Image();
       img.src = URL.createObjectURL(file);
       img.onload = async () => {
@@ -769,9 +820,30 @@
           playBeep();
           simulateScan(nameMatch[0]);
         } else {
-          showToast('Código no detectado en la imagen');
+          showToast('Código de barras no detectado en la imagen');
         }
       };
+    }
+
+    // Global Clipboard Paste (Ctrl + V)
+    window.addEventListener('paste', (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.type.indexOf('image') !== -1) {
+          const blob = item.getAsFile();
+          if (blob) {
+            showToast('Decodificando imagen pegada...');
+            handleImageFile(blob);
+          }
+        }
+      }
+    });
+
+    async function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      handleImageFile(file);
     }
 
     function renderQuickList() {
