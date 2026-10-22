@@ -1,10 +1,12 @@
 import React from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CartProvider, useCart } from '../context/CartContext';
 import { Colors } from '../theme/colors';
+import { AuthProvider, useAuth } from '../context/AuthContext';
+import { LoginScreen } from '../components/LoginScreen';
 
 function CartHeaderButton() {
   const router = useRouter();
@@ -30,6 +32,9 @@ function CartHeaderButton() {
 }
 
 function RootNavigator() {
+  const { session, role, loading } = useAuth();
+  if (loading) return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={Colors.secondary} /></View>;
+  if (!session || !role) return <LoginScreen />;
   return (
     <>
       <StatusBar style="light" />
@@ -76,6 +81,8 @@ function RootNavigator() {
             title: 'Resumen de Venta',
           }}
         />
+        <Stack.Screen name="inventario" options={{ title: 'Inventario' }} />
+        <Stack.Screen name="asistente" options={{ title: 'Asistente IA' }} />
       </Stack>
     </>
   );
@@ -83,9 +90,7 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <CartProvider>
-      <RootNavigator />
-    </CartProvider>
+    <AuthProvider><CartProvider><RootNavigator /></CartProvider></AuthProvider>
   );
 }
 

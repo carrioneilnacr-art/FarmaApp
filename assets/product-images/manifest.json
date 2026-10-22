@@ -1,0 +1,179 @@
+{
+  "description": "Fotos de referencia por dosis y presentación autorizadas por el usuario. No acreditan la marca del inventario físico.",
+  "products": [
+    {
+      "code": "BOT-000001",
+      "sourcePage": "https://farmacorp.com/products/7750215496886",
+      "sourceUrl": "https://farmacorp.com/cdn/shop/files/7750215496886_1200x1200.jpg?v=1771647639",
+      "match": "Paracetamol 500 mg Tablets Packaging",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000002",
+      "sourcePage": "https://ligafarmacia.cl/product/008490020-ibuprofeno-400-mg",
+      "sourceUrl": "https://ligafarmacia.cl/assets/fotos-productos/00849-1.webp",
+      "match": "Ibuprofeno 400 mg Coated Tablets",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000003",
+      "sourcePage": "https://farmaciaelquimico.cl/products/naproxeno-550mg",
+      "sourceUrl": "https://cdn.shopify.com/s/files/1/0520/3312/6568/products/7800063001944_1200x1200.jpg?v=1611987951",
+      "match": "Naproxeno Sódico 550 mg Coated Tablets",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000004",
+      "sourcePage": "https://www.farmaciauniversal.com/panadol-antigripal-tabletas-sobre-2-und/p?srsltid=AfmBOooCZ-VvsAm89XG85QdNMA1mCOszhKCm_LATxqHYFjXqawYfA2jr",
+      "sourceUrl": "https://farmaciauniversalpe.vtexassets.com/arquivos/ids/163614-800-auto?aspect=true&height=auto&v=638937453604870000&width=800",
+      "match": "Panadol Antigripal NF 2-Tablet Sachet",
+      "note": "Foto del sobre de 2 tabletas; referencia de la marca, no de la caja de 24."
+    },
+    {
+      "code": "BOT-000005",
+      "sourcePage": "https://www.mercadofarma.cl/products/clonixinato-de-lisina-125-mg-10-comprimidos",
+      "sourceUrl": "https://www.mercadofarma.cl/cdn/shop/files/Clonixinatodelisina125mg10Comprimidos.webp?v=1692368201",
+      "match": "Clonixinato de lisina 125 mg, 10 comprimidos"
+    },
+    {
+      "code": "BOT-000006",
+      "sourcePage": "https://www.farmatodo.com.co/producto/220700050-amoxicilina-500-mg-la-sante-caja-x-50-capsulas",
+      "sourceUrl": "https://product-images.farmatodo.com/qgO2HsYvqoHuuFzj1e1vZSwXyC8RLT1Q1pJT7XWqY_Dh9qLRoItLkCImi2ppHxsQSSCKhkdOLsiUEGzFHxgRNj6H-pl8eBfrAr28MfcuT3G5lOc",
+      "match": "La Santé Amoxicilina 500 mg – 50 Cápsulas",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000007",
+      "sourcePage": "https://prixz.com/c/azitromicina-500-mg-con-3-tabletas-alpharma/",
+      "sourceUrl": "https://res.cloudinary.com/prixz/image/upload/q_auto/f_auto/items/7502226291901.webp",
+      "match": "Alpharma Azitromicina 500 mg Tablets",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000008",
+      "sourcePage": "https://www.medicar.mx/productos/ciprofloxacino-500-mg-c-10-tab-loeffler/",
+      "sourceUrl": "https://acdn-us.mitiendanube.com/stores/003/744/253/products/imagen-producto7bf354e47412496388bc18a4b0ce94a3-3e46fb7cec5911c7ac17664408817588-1024-1024.webp",
+      "match": "Ciprofloxacino 500 mg Tablets",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000009",
+      "sourcePage": "https://regiofarma.mx/products/cefalexina-500mg-20caps-amsa",
+      "sourceUrl": "https://regiofarma.mx/cdn/shop/files/53_7501349021181_7775abe2-958e-4c79-afde-5a24a51a78ea.jpg?v=1753479830",
+      "match": "Cefalexina 500 mg Capsules",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000010",
+      "sourcePage": "https://www.midifam.com/shop/claritromicina-500mg-claritromicina-500mg-c-10-tabletas-amsa-41877",
+      "sourceUrl": "https://www.midifam.com/web/image/product.template/41877/image_1024?unique=463d788",
+      "match": "AMSA Claritromicina 500 mg Tablets",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000011",
+      "sourcePage": "https://www.walmart.com.mx/ip/cetirizina-medi-mart-10-mg-10-tabletas/00750125820643",
+      "sourceUrl": "https://i5-mx.walmartimages.com/gr/images/product-images/img_large/00750125820643L.jpg",
+      "match": "Cetirizina 10 mg Tablet Packaging",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000012",
+      "sourcePage": "https://www.tudrogueriavirtual.com/loratadina-10-mg-caja-x-10-tabl-7703712031784/p",
+      "sourceUrl": "https://unidrogas.vtexassets.com/arquivos/ids/369959/7703712031784.jpg?v=638891182942230000",
+      "match": "Loratadina 10 mg Genéricos Coaspharma",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000013",
+      "sourcePage": "https://www.mifarma.com.pe/producto/clorfenamina-4mg-portugaltableta-/134310",
+      "sourceUrl": "https://dcuk1cxrnzjkh.cloudfront.net/imagesproducto/134310M.jpg",
+      "match": "Clorfeniramina Maleato 4 mg Tablets",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000014",
+      "sourcePage": "https://www.sams.com.mx/ip/levocetirizina-5-mg-con-10-tabletas/980007412",
+      "sourceUrl": "https://i5-mx.walmartimages.com/samsmx/images/product-images/img_large/980007412l.jpg",
+      "match": "Medimart Levocetirizina 5 mg Tablets",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000015",
+      "sourcePage": "https://www.tudrogueriavirtual.com/desloratadina-5-mg-x-10-tabl/p",
+      "sourceUrl": "https://unidrogas.vtexassets.com/arquivos/ids/458079/7703432230160.jpg?v=638891174222000000",
+      "match": "Desloratadina 5 mg – 10 Tabletas Recubiertas",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000016",
+      "sourcePage": "https://www.farmacenter.com.py/catalogo/alcohol-etil-70-farmacenter-fr-x-1000_10015408_10015408",
+      "sourceUrl": "https://f.fcdn.app/imgs/10f4bc/www.farmacenter.com.py/farmpy/5e60/original/catalogo/10015408_10015408_1/1500-1500/alcohol-etil-70-farmacenter-fr-x-1000-unica.jpg",
+      "match": "Farmacenter 70% Ethyl Alcohol Bottle",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000017",
+      "sourcePage": "https://igropar.com/en/desinfeccion/221-hydrogen-peroxide-250-ml.html",
+      "sourceUrl": "https://igropar.com/1640-large_default/hydrogen-peroxide-250-ml.jpg",
+      "match": "Hydrogen Peroxide 250 ml Bottle",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000018",
+      "sourcePage": "https://farmaciaslider.pe/product/Algodon-Ckf-X-100G/56629129",
+      "sourceUrl": "https://farmaciaslider.pe/my-assets/image/product/dddfcc9270978c4d48dd340363b07e8b.jpg",
+      "match": "CKF Hydrophilic Cotton 100g",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000019",
+      "sourcePage": "https://grupocamed.com/dgasas.php?id=73",
+      "sourceUrl": "https://grupocamed.com/sistema/dataimg/productos/original/DSC_02680.jpg",
+      "match": "Corona Sterile Folded Gauze Pack",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000020",
+      "sourcePage": "https://www.superxtra.com/venda-elastica-migasa-rollo-4-pulgadas-755331020035/p",
+      "sourceUrl": "https://superxtrapanama.vtexassets.com/arquivos/ids/180926/755331020035.png?v=638218325483570000",
+      "match": "YAJOO Elastic Bandage Roll",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000021",
+      "sourcePage": "https://www.falabella.com.pe/falabella-pe/product/142713237/Bloqueador-Solar-BUBBLE-SPF-50-de-120-ML/142713238",
+      "sourceUrl": "https://media.falabella.com/falabellaPE/142713238_01/w%3D1500%2Ch%3D1500%2Cfit%3Dcover",
+      "match": "Bubble SPF 50 Sunscreen",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000022",
+      "sourcePage": "https://www.superaki.mx/products/331999-132-jabon-liquido-corporal-escudo-proteccion-neutra",
+      "sourceUrl": "https://cdn.shopify.com/s/files/1/0566/4391/1854/products/7506425609468_041021_6482e724-af30-4c3e-b98c-868de57dee19.png?v=1674448360",
+      "match": "Escudo Antibacterial Body Wash",
+      "note": "Coinciden tipo, neutralidad y volumen; el envase de referencia no tiene dispensador."
+    },
+    {
+      "code": "BOT-000023",
+      "sourcePage": "https://www.delcantomedical.com/products/termometro-digital-omron-mc-343f-punta-flexible",
+      "sourceUrl": "https://www.delcantomedical.com/cdn/shop/files/termometro-digital-omron-mc-343f-punta-flexible-2515692.webp?v=1764876068",
+      "match": "Omron MC-343F Digital Thermometer",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000024",
+      "sourcePage": "https://www.puntofarma.com.py/producto/201840/alcohol-en-gel-ultra-algabo-70-500-ml",
+      "sourceUrl": "https://www.puntofarma.com.py/imagenes/public/images/Alcohol-en-Gel-Ultra-Algabo-70-500-mL-43558.webp",
+      "match": "Algabo Ultra 70% Alcohol Gel Hand Sanitizer",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    },
+    {
+      "code": "BOT-000025",
+      "sourcePage": "https://www.subasalud.co/products/cepillo-dental-dental-ortodontico-gum",
+      "sourceUrl": "https://www.subasalud.co/cdn/shop/files/Cepillo_Dental_Dental_Ortodontico_Gum_db52433c-8bb2-45b4-9cfd-cc4c6f9a0131.jpg?v=1771904229&width=1445",
+      "match": "GUM Sunstar Orthodontic Toothbrush",
+      "note": "Referencia de marca; confirmar contra el inventario físico."
+    }
+  ]
+}

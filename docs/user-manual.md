@@ -2,6 +2,10 @@
 
 Bienvenido al manual oficial de **FarmaApp**, la aplicación móvil desarrollada para facilitar y acelerar la atención a los clientes en la botica.
 
+Para entrar en la APK usa el ID **Administrador** o **Trabajador** y la contraseña entregada por el propietario. No se solicita correo. El celular debe tener internet para validar el acceso y consultar datos del servidor. Usa **Cerrar sesión** en la pantalla principal al terminar el turno.
+
+En **Asistente IA** puedes consultar stock bajo o buscar un producto. El ID Administrador también puede consultar el resumen de ventas del día. Escribe una pregunta, pulsa **Consultar** y espera la respuesta basada en los datos actuales de Supabase. El asistente no da indicaciones médicas.
+
 ---
 
 ## 1. Conociendo la Pantalla Principal
@@ -116,4 +120,6 @@ Cuando el cliente se acerca al mostrador solicitando un medicamento, tienes dos 
 * La aplicación te mostrará un aviso de advertencia indicando que no hay conexión. Tus productos en el carrito se mantendrán guardados y podrás presionar **"Reintentar"** una vez restablecida la señal.
 
 ### ¿Cómo sé cuándo un medicamento está por agotarse?
-* Los productos con stock igual o inferior a 5 unidades mostrarán una etiqueta de advertencia en color naranja (**"Stock Bajo: X unid."**), permitiéndote avisar al encargado para su reposición.
+* En la pantalla principal, abre **Inventario y Alertas**. Allí aparecen las existencias de cada producto y el filtro **Alertas** muestra los agotados y los que están en su mínimo o por debajo de él.
+* Toca un producto para consultar sus movimientos recientes. Desliza hacia abajo para actualizar los datos desde Supabase.
+* La cobertura aproximada toma las salidas por venta de los últimos 30 días. Si no hay datos de ventas suficientes, se indica **sin datos**. Aún no se gestionan lotes ni fechas de vencimiento.

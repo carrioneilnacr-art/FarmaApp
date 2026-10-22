@@ -15,9 +15,11 @@ import { saleRepository } from '../repositories/saleRepository';
 import { ResumenDiario } from '../types/database';
 import { DailySummaryCard } from '../components/DailySummaryCard';
 import { Colors } from '../theme/colors';
+import { useAuth } from '../context/AuthContext';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { role, signOut } = useAuth();
   const { totalItems, totalAmount } = useCart();
   const [resumen, setResumen] = useState<ResumenDiario | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -81,6 +83,7 @@ export default function HomeScreen() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
           <Text style={styles.sectionSubtitle}>Selecciona una operación</Text>
+          <TouchableOpacity onPress={signOut} accessibilityRole="button" accessibilityLabel="Cerrar sesión"><Text style={{ color: Colors.secondary, fontWeight: '700', marginTop: 8 }}>Cerrar sesión · {role}</Text></TouchableOpacity>
         </View>
 
         <View style={styles.actionGrid}>
@@ -169,6 +172,27 @@ export default function HomeScreen() {
                 Historial, devoluciones, anulación e incidencias
               </Text>
             </View>
+            <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionCard}
+            activeOpacity={0.85}
+            onPress={() => router.push('/inventario')}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir inventario y alertas"
+          >
+            <View style={[styles.actionIconContainer, { backgroundColor: Colors.tealWash }]}>
+              <Ionicons name="layers-outline" size={28} color={Colors.secondary} />
+            </View>
+            <View style={styles.actionTextContainer}>
+              <Text style={styles.actionCardTitle}>Inventario y Alertas</Text>
+              <Text style={styles.actionCardSubtitle}>Stock, reposición y movimientos</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionCard} activeOpacity={0.85} onPress={() => router.push('/asistente')} accessibilityRole="button" accessibilityLabel="Abrir asistente IA">
+            <View style={[styles.actionIconContainer, { backgroundColor: Colors.primaryLight }]}><Ionicons name="sparkles-outline" size={28} color={Colors.primaryDark} /></View>
+            <View style={styles.actionTextContainer}><Text style={styles.actionCardTitle}>Asistente IA</Text><Text style={styles.actionCardSubtitle}>Consulta stock y operaciones con datos del servidor</Text></View>
             <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
           </TouchableOpacity>
         </View>

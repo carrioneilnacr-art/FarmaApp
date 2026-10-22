@@ -101,6 +101,11 @@ En el **SQL Editor** de tu proyecto Supabase, ejecuta los scripts en el siguient
 2. `database/rpc.sql`
 3. `database/policies.sql`
 4. `database/seed.sql`
+5. `database/assistant_auth.sql`
+6. `database/secure_operational_access.sql`
+7. `database/guard_sale_rpcs.sql`
+
+Despliega `supabase/functions/asistente-operativo/index.ts` con verificación JWT habilitada. El secreto `farmaapp_openai_api_key` debe guardarse en Supabase Vault; nunca en variables `EXPO_PUBLIC_` ni dentro de la APK. Crea las cuentas técnicas `administrador@farmaapp.invalid` y `trabajador@farmaapp.invalid` mediante Supabase Auth con `app_metadata.farmaapp_role` igual a `administrador` o `trabajador`. La pantalla muestra únicamente el ID. Para esta instancia, las cuentas y el secreto ya están configurados en Supabase.
 
 ### 5.3. Iniciar la Aplicación en Modo Desarrollo
 ```bash
@@ -138,14 +143,18 @@ Consulta la [Guía de Despliegue](./docs/deployment.md) para conocer los pasos d
 
 ## 📚 8. Índice de Documentación del Proyecto
 
+Fotos de productos, rutas de Storage y actualización en la APK: [Guía de imágenes del catálogo](docs/product-images.md).
+
 | Documento | Descripción |
 | :--- | :--- |
 | 📄 [**Requerimientos de Software**](./docs/requirements.md) | Especificación de RF, RNF y Criterios de Aceptación. |
 | 🔄 [**Procesos de Negocio (AS-IS / TO-BE)**](./docs/process.md) | Diagramas de flujo en Mermaid y matriz comparativa de tiempos. |
 | 📋 [**Casos de Uso (Entrega 1: POS)**](./docs/use-cases.md) | Detalle de CU-01 a CU-04 con flujos principales y alternativos. |
 | 🛡️ [**Proceso 2: Gestión y Corrección de Ventas**](./docs/process-2-gestion-ventas.md) | Inmutabilidad de ventas, devoluciones atómicas, anulación controlada, Kardex farmacéutico y diseño Clinical Apothecary Minimalist. |
+| 📦 [**Procesos, inventario y asistente IA**](./docs/procesos-inventario-asistente-ia.md) | Documento funcional aportado para la evolución del producto; incluye el roadmap y costos ilustrativos. |
+| 🧭 [**Estado de implementación del roadmap**](./docs/roadmap-status.md) | Qué partes funcionan, cuáles están pendientes y qué depende de autenticar al personal. |
 | 🗄️ [**Base de Datos y Modelo ERD**](./docs/database.md) | Diccionario de datos, diagrama ERD, políticas RLS y transacciones RPC. |
-| 🧪 [**Plan y Matriz de Pruebas**](./docs/testing.md) | Casos de prueba funcionales, de escaneo, carrito, consistencia y 6 suites automatizadas con 58 tests. |
+| 🧪 [**Plan y Matriz de Pruebas**](./docs/testing.md) | Casos de prueba funcionales, de escaneo, carrito y consistencia. |
 | 🚀 [**Guía de Despliegue y EAS Build**](./docs/deployment.md) | Paso a paso para Supabase, Expo, compilación de APK y solución de errores. |
 | 📖 [**Manual de Usuario**](./docs/user-manual.md) | Guía operativa amigable para el trabajador de la botica. |
 | 💡 [**Explicación Práctica de la App**](./docs/EXPLICACION_PRACTICA.md) | Guía ejecutiva y práctica de qué problemas resuelve FarmaApp y cómo funciona. |

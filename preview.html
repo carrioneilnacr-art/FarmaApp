@@ -201,6 +201,17 @@
                 <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </button>
 
+              <button onclick="navigateTab('inventory')" class="w-full bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl p-3.5 flex items-center gap-3 transition text-left shadow-sm">
+                <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16M6 4v16m12-16v16"/></svg>
+                </div>
+                <div class="flex-1">
+                  <div class="font-bold text-xs text-zinc-900">Inventario y Alertas</div>
+                  <div class="text-[10px] text-zinc-500">Stock, reposición y movimientos</div>
+                </div>
+                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+
               <!-- Daily Summary Card on Home -->
               <div class="p-3.5 bg-white border border-zinc-200 rounded-2xl space-y-2 shadow-sm">
                 <div class="flex items-center justify-between">
@@ -349,7 +360,29 @@
               </div>
             </div>
 
-            <!-- SCREEN 5: HISTORIAL Y GESTION DE VENTAS -->
+            <!-- SCREEN 5: INVENTARIO (VISTA DEL SIMULADOR) -->
+            <div id="screen-inventory" class="absolute inset-0 overflow-y-auto p-3.5 hidden bg-zinc-50">
+              <div class="flex items-center gap-2 mb-3">
+                <button onclick="navigateTab('home')" aria-label="Volver al inicio" class="w-9 h-9 flex items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-700">←</button>
+                <div>
+                  <div class="text-sm font-bold text-zinc-900">Inventario</div>
+                  <div class="text-[10px] text-zinc-500">Vista de muestra · la APK consulta Supabase</div>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2 mb-3">
+                <div class="p-3 bg-white border border-zinc-200 rounded-lg"><div id="inventory-count" class="text-xl font-bold">25</div><div class="text-[10px] text-zinc-500">Productos</div></div>
+                <div class="p-3 bg-white border border-zinc-200 rounded-lg"><div id="inventory-alert-count" class="text-xl font-bold text-rose-700">0</div><div class="text-[10px] text-zinc-500">Alertas de stock</div></div>
+              </div>
+              <input id="inventory-search" oninput="renderInventory()" aria-label="Buscar producto en inventario" placeholder="Buscar producto o código" class="w-full p-3 text-xs border border-zinc-300 bg-white rounded-lg mb-2">
+              <div class="flex gap-2 mb-3">
+                <button id="inventory-all" onclick="setInventoryFilter('all')" class="px-3 py-2 text-xs font-semibold rounded-lg bg-teal-50 border border-teal-700 text-teal-800">Todos</button>
+                <button id="inventory-alerts" onclick="setInventoryFilter('alerts')" class="px-3 py-2 text-xs font-semibold rounded-lg bg-white border border-zinc-200 text-zinc-700">Alertas</button>
+              </div>
+              <div id="inventory-list" class="space-y-2"></div>
+              <p class="text-[10px] text-zinc-500 leading-relaxed mt-3 pb-8">Esta vista usa datos de muestra. La APK muestra existencias y movimientos reales de Supabase. Aún no hay gestión de lotes o vencimientos.</p>
+            </div>
+
+            <!-- SCREEN 6: HISTORIAL Y GESTION DE VENTAS -->
             <div id="screen-ventas" class="absolute inset-0 flex flex-col p-3.5 hidden bg-zinc-50 overflow-y-auto">
               <!-- Header -->
               <div class="flex items-center justify-between pb-2 border-b border-zinc-200 mb-2">
@@ -561,7 +594,35 @@
   </div>
 
   <script>
-    const SUPABASE_STORAGE_URL = 'https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/';
+    // Same versioned Supabase photos used by the mobile catalog.
+    const PRODUCT_IMAGE_URLS = [
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000001-c7055e285709.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000002-d529027e0e91.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000003-315b119ffc97.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000004-0c285b3a4c8a.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000005-58ce120f77c0.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000006-1ffd40009039.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000007-cdc37ab563f7.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000008-a2608aa752cd.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000009-31547296fcd3.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000010-133222192800.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000011-080b841c366d.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000012-64214f328212.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000013-bd78965ccbc9.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000014-28b5c252e103.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000015-5be4f8def833.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000016-0c25a94edc45.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000017-7a9c08999b94.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000018-02715390f375.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000019-629bd89b3cd2.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000020-ba2e5da6a249.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000021-efa79eaded3a.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000022-8f1dc56941d6.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000023-dd06f8599583.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000024-8898ea352c83.jpg",
+      "https://rlldwhipkzcbjjjbqozg.supabase.co/storage/v1/object/public/productos/catalog-v2/BOT-000025-80bb70a30e9b.jpg"
+    ];
+    const PRODUCT_IMAGE_FALLBACK = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="#f4f4f5"/><path d="M30 50h40M50 30v40" stroke="#a1a1aa" stroke-width="8" stroke-linecap="round"/></svg>');
     const RAW_PRODUCTS = [
       {id:1,cat:'Analgesicos',code:'BOT-000001',name:'Paracetamol 500 mg (Caja x 100)',price:15.50,stock:60,min:10},
       {id:2,cat:'Analgesicos',code:'BOT-000002',name:'Ibuprofeno 400 mg (Caja x 20)',price:12.00,stock:45,min:8},
@@ -589,9 +650,9 @@
       {id:24,cat:'Cuidado Personal',code:'BOT-000024',name:'Gel Antibacterial 70% (Frasco x 500 ml)',price:9.00,stock:45,min:10},
       {id:25,cat:'Cuidado Personal',code:'BOT-000025',name:'Cepillo Dental Ortodoncia Suave (Unidad)',price:8.00,stock:60,min:15},
     ];
-    const PRODUCTS = RAW_PRODUCTS.map(p => ({
+    const PRODUCTS = RAW_PRODUCTS.map((p, index) => ({
       ...p,
-      img: `${SUPABASE_STORAGE_URL}${p.code}.jpg`
+      img: PRODUCT_IMAGE_URLS[index]
     }));
 
     let products = JSON.parse(JSON.stringify(PRODUCTS));
@@ -797,7 +858,7 @@
     function renderQuickList() {
       document.getElementById('quick-list').innerHTML = products.map(p => `
         <div onclick="simulateScan('${p.code}')" class="flex items-center justify-between px-2.5 py-1.5 rounded-xl hover:bg-zinc-50 cursor-pointer group transition border border-transparent hover:border-zinc-200 gap-2.5">
-          <img src="${p.img}" alt="${p.name}" class="w-8 h-8 rounded-lg object-contain bg-zinc-50 border border-zinc-200 shrink-0" onerror="this.src='/barcodes/${p.code}.png'">
+          <img src="${p.img}" alt="${p.name}" class="w-8 h-8 rounded-lg object-contain bg-white border border-zinc-200 shrink-0" onerror="this.onerror=null; this.src=PRODUCT_IMAGE_FALLBACK">
           <div class="overflow-hidden flex-1">
             <div class="text-xs font-semibold text-zinc-900 group-hover:text-black truncate">${p.name}</div>
             <div class="text-[10px] font-mono text-zinc-500">${p.code} · Stock: ${p.stock}</div>
@@ -827,7 +888,7 @@
         const stockColor = {ok:'text-emerald-700 bg-emerald-50 border border-emerald-200', bajo:'text-amber-700 bg-amber-50 border border-amber-200', agotado:'text-red-700 bg-red-50 border border-red-200'}[stockState];
         return `
           <div class="p-3 bg-white border border-zinc-200 rounded-2xl flex items-center justify-between shadow-sm gap-2.5">
-            <img src="${p.img}" alt="${p.name}" class="w-14 h-14 rounded-xl object-contain bg-zinc-50 border border-zinc-200 p-1 shrink-0" onerror="this.src='/barcodes/${p.code}.png'">
+            <img src="${p.img}" alt="${p.name}" class="w-14 h-14 rounded-xl object-contain bg-white border border-zinc-200 shrink-0" onerror="this.onerror=null; this.src=PRODUCT_IMAGE_FALLBACK">
             <div class="flex-1 mr-1 overflow-hidden">
               <div class="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">${p.cat}</div>
               <div class="text-xs font-bold text-zinc-900 leading-tight truncate">${p.name}</div>
@@ -867,7 +928,7 @@
 
       el.innerHTML = cart.map(item => `
         <div class="p-3 bg-white border border-zinc-200 rounded-2xl flex items-center gap-2.5 shadow-sm">
-          <img src="${item.img || ''}" alt="${item.name}" class="w-11 h-11 rounded-lg object-contain bg-zinc-50 border border-zinc-200 shrink-0" onerror="this.style.display='none'">
+          <img src="${item.img || ''}" alt="${item.name}" class="w-11 h-11 rounded-lg object-contain bg-white border border-zinc-200 shrink-0" onerror="this.onerror=null; this.src=PRODUCT_IMAGE_FALLBACK">
           <div class="flex-1 overflow-hidden">
             <div class="text-xs font-bold text-zinc-900 leading-tight truncate">${item.name}</div>
             <div class="text-[10px] text-zinc-500 font-mono mt-0.5">S/ ${item.price.toFixed(2)} c/u · Sub: S/ ${item.sub.toFixed(2)}</div>
@@ -1458,7 +1519,7 @@
     }
 
     function navigateTab(tab) {
-      const allTabs = ['home', 'search', 'scan', 'cart', 'ventas', 'venta-detail'];
+      const allTabs = ['home', 'search', 'scan', 'cart', 'inventory', 'ventas', 'venta-detail'];
       allTabs.forEach(t => {
         const screen = document.getElementById(`screen-${t}`);
         if (screen) screen.classList.add('hidden');
@@ -1481,9 +1542,49 @@
       if (tab === 'ventas') {
         renderSalesList();
       }
+      if (tab === 'inventory') {
+        renderInventory();
+      }
       if (tab === 'home') {
         updateKpis();
       }
+    }
+
+    let inventoryFilter = 'all';
+    function setInventoryFilter(value) {
+      inventoryFilter = value;
+      document.getElementById('inventory-all').className = value === 'all'
+        ? 'px-3 py-2 text-xs font-semibold rounded-lg bg-teal-50 border border-teal-700 text-teal-800'
+        : 'px-3 py-2 text-xs font-semibold rounded-lg bg-white border border-zinc-200 text-zinc-700';
+      document.getElementById('inventory-alerts').className = value === 'alerts'
+        ? 'px-3 py-2 text-xs font-semibold rounded-lg bg-teal-50 border border-teal-700 text-teal-800'
+        : 'px-3 py-2 text-xs font-semibold rounded-lg bg-white border border-zinc-200 text-zinc-700';
+      renderInventory();
+    }
+
+    function renderInventory() {
+      const query = document.getElementById('inventory-search').value.trim().toLowerCase();
+      const alerts = products.filter(product => product.stock <= product.min).length;
+      document.getElementById('inventory-count').textContent = products.length;
+      document.getElementById('inventory-alert-count').textContent = alerts;
+      const visible = products.filter(product =>
+        (inventoryFilter === 'all' || product.stock <= product.min) &&
+        (!query || product.name.toLowerCase().includes(query) || product.code.toLowerCase().includes(query))
+      ).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+      document.getElementById('inventory-list').innerHTML = visible.length ? visible.map(product => `
+        <div class="flex items-center gap-2 p-2.5 bg-white border border-zinc-200 rounded-lg">
+          <img src="${product.img}" alt="" class="w-12 h-12 object-contain bg-white rounded" onerror="this.src=PRODUCT_IMAGE_FALLBACK">
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-semibold text-zinc-900 leading-tight">${product.name}</div>
+            <div class="text-[10px] text-zinc-500 mt-1">${product.code} · Mínimo ${product.min}</div>
+            <div class="text-[10px] text-zinc-500">Cobertura sin datos</div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="text-lg font-bold ${product.stock <= product.min ? 'text-rose-700' : 'text-zinc-900'}">${product.stock}</div>
+            <div class="text-[10px] ${product.stock <= product.min ? 'text-rose-700' : 'text-teal-700'}">${product.stock <= 0 ? 'Agotado' : product.stock <= product.min ? 'Reponer' : 'Disponible'}</div>
+          </div>
+        </div>
+      `).join('') : '<div class="text-xs text-zinc-500 text-center py-5">No hay productos para este filtro.</div>';
     }
 
     let toastTimer;
@@ -1567,6 +1668,7 @@
     init();
     updateKpis();
     renderSalesList();
+    if (location.hash === '#inventario') navigateTab('inventory');
   </script>
 </body>
 </html>
