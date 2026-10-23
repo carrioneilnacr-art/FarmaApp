@@ -12,6 +12,18 @@
 
 ## 🎯 2. Propuesta de Valor y Proceso de Negocio
 
+### Procesos actuales de la APK
+
+1. **Acceso por perfil:** Administrador gestiona catálogo e inventario; Trabajador consulta productos y atiende ventas. El perfil activo aparece en Inicio.
+2. **Alta de productos:** Administrador abre Inventario → Registrar producto, elige o crea categoría e ingresa nombre, código de barras, precio y existencias.
+3. **Búsqueda y escaneo:** El catálogo se filtra por nombre, código o categoría. Tras escanear, se puede agregar e ir al carrito o agregar y continuar escaneando.
+4. **Venta:** Se revisan cantidades y datos del cliente, se confirma la operación y Supabase registra la boleta y descuenta stock en una transacción.
+5. **Corrección de boleta:** En Gestión de ventas se agregan, retiran o ajustan productos de la misma venta. Se conservan ID, número, comprobante y cliente; se recalcula el total y el stock y se guarda el historial antes/después.
+6. **Devolución y anulación:** Son operaciones controladas con incidencias, historial y movimientos de inventario.
+7. **Asistente IA:** Consulta datos del servidor mediante una función de Supabase; la clave de OpenAI permanece en el servidor.
+
+La corrección de boleta es interna de FarmaApp. No sustituye los procedimientos tributarios de un emisor electrónico externo.
+
 ```text
 Cliente solicita producto
         ↓
