@@ -125,6 +125,10 @@ export interface Database {
         };
         Returns: { success: boolean; incidencia_id: string; mensaje: string };
       };
+      corregir_venta_atomica: {
+        Args: { p_venta_id: string; p_items: Json; p_motivo?: string };
+        Returns: CorregirVentaResponse;
+      };
     };
     Enums: {
       metodo_pago: MetodoPago;
@@ -535,6 +539,18 @@ export interface AnularVentaResponse {
   venta_id: string;
   codigo_venta: string;
   nuevo_estado: EstadoVenta;
+  mensaje: string;
+}
+
+export interface CorregirVentaResponse {
+  success: boolean;
+  venta_id: string;
+  codigo_venta: string;
+  numero_venta?: string | null;
+  comprobante?: string | null;
+  total: number;
+  cliente_nombre?: string | null;
+  cliente_documento?: string | null;
   mensaje: string;
 }
 

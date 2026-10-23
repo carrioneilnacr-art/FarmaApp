@@ -86,11 +86,18 @@ export default function EscanearScreen() {
     }, 600);
   };
 
-  const handleAddToCart = () => {
+  const handleAddAndContinue = () => {
     if (scannedProduct) {
       addItem(scannedProduct, 1);
       handleCloseModal();
     }
+  };
+
+  const handleAddAndGoToCart = () => {
+    if (!scannedProduct) return;
+    addItem(scannedProduct, 1);
+    setModalVisible(false);
+    router.replace('/venta');
   };
 
   if (!permission) {
@@ -273,17 +280,18 @@ export default function EscanearScreen() {
                         ? 'Agotado (Sin Stock)'
                         : isMaxReached
                         ? 'Máximo Stock en Carrito'
-                        : '+ Agregar a la Venta'
+                        : 'Agregar e ir al carrito'
                     }
-                    onPress={handleAddToCart}
+                    onPress={handleAddAndGoToCart}
                     disabled={isOutOfStock || isMaxReached}
                     style={{ flex: 1 }}
                   />
                   <TouchableOpacity
                     style={styles.cancelButton}
-                    onPress={handleCloseModal}
+                    onPress={handleAddAndContinue}
+                    disabled={isOutOfStock || isMaxReached}
                   >
-                    <Text style={styles.cancelButtonText}>Continuar Escaneando</Text>
+                    <Text style={styles.cancelButtonText}>Agregar y continuar escaneando</Text>
                   </TouchableOpacity>
                 </View>
               </View>

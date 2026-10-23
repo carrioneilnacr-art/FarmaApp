@@ -82,6 +82,8 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen name="inventario" options={{ title: 'Inventario' }} />
+        <Stack.Screen name="producto-nuevo" options={{ title: 'Registrar producto' }} />
+        <Stack.Screen name="ventas/editar/[id]" options={{ title: 'Corregir boleta' }} />
         <Stack.Screen name="asistente" options={{ title: 'Asistente IA' }} />
       </Stack>
     </>

@@ -7,26 +7,29 @@ import {
   ActivityIndicator,
   RefreshControl,
   SafeAreaView,
-  Animated,
+  Pressable,
+  ScrollView,
 } from 'react-native';
 import { SearchBar } from '../components/SearchBar';
 import { ProductCard } from '../components/ProductCard';
 import { productRepository } from '../repositories/productRepository';
-import { ProductoConCategoria } from '../types/database';
+import { Categoria, ProductoConCategoria } from '../types/database';
 import { Colors } from '../theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function BuscarScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState<ProductoConCategoria[]>([]);
+  const [categories, setCategories] = useState<Categoria[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const fetchProducts = useCallback(async (query: string = '') => {
+  const fetchProducts = useCallback(async (query: string = '', categoryId: string | null = null) => {
     try {
       setLoading(true);
-      const data = await productRepository.searchProducts(query);
+      const data = await productRepository.searchProducts(query, 100, categoryId || undefined);
       setProducts(data);
     } catch (err) {
       console.error('Error in fetchProducts:', err);
@@ -36,18 +39,24 @@ export default function BuscarScreen() {
     }
   }, []);
 
+  useEffect(() => {
+    productRepository.getCategories().then(setCategories).catch(error => {
+      console.error('Error loading categories:', error);
+    });
+  }, []);
+
   // Búsqueda reactiva con debounce
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchProducts(searchQuery);
+      fetchProducts(searchQuery, selectedCategory);
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, fetchProducts]);
+  }, [searchQuery, selectedCategory, fetchProducts]);
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchProducts(searchQuery);
+    fetchProducts(searchQuery, selectedCategory);
   };
 
   const showToast = (message: string) => {
@@ -67,6 +76,32 @@ export default function BuscarScreen() {
           placeholder="Nombre del fármaco o código..."
           autoFocus={false}
         />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoryList}
+          accessibilityRole="tablist"
+        >
+          <Pressable
+            onPress={() => setSelectedCategory(null)}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: selectedCategory === null }}
+            style={[styles.categoryChip, selectedCategory === null && styles.categoryChipActive]}
+          >
+            <Text style={[styles.categoryText, selectedCategory === null && styles.categoryTextActive]}>Todos</Text>
+          </Pressable>
+          {categories.map(category => (
+            <Pressable
+              key={category.id}
+              onPress={() => setSelectedCategory(category.id)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: selectedCategory === category.id }}
+              style={[styles.categoryChip, selectedCategory === category.id && styles.categoryChipActive]}
+            >
+              <Text style={[styles.categoryText, selectedCategory === category.id && styles.categoryTextActive]}>{category.nombre}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
       </View>
 
       {/* Listado de Productos */}
@@ -131,6 +166,26 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.cardBorder,
   },
+  categoryList: {
+    gap: 8,
+    paddingTop: 10,
+    paddingRight: 12,
+  },
+  categoryChip: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.white,
+  },
+  categoryChipActive: {
+    borderColor: Colors.secondary,
+    backgroundColor: Colors.tealWash,
+  },
+  categoryText: { color: Colors.textSecondary, fontSize: 14, fontWeight: '600' },
+  categoryTextActive: { color: Colors.secondary, fontWeight: '700' },
   listContent: {
     paddingVertical: 10,
     paddingBottom: 40,

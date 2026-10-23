@@ -137,8 +137,10 @@
               
               <!-- Greeting Banner -->
               <div class="bg-zinc-900 text-white rounded-2xl p-4 shadow-sm">
-                <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Atencion al Cliente</div>
-                <div class="text-base font-extrabold mt-0.5">Venta Mostrador</div>
+                <div class="flex items-center justify-between gap-3">
+                  <div><div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Perfil activo</div><div class="text-base font-extrabold mt-0.5">Administrador</div></div>
+                  <span class="text-[10px] font-bold bg-white/10 border border-white/20 px-2.5 py-1.5 rounded-lg">Control total</span>
+                </div>
                 <div class="mt-3 pt-2 border-t border-zinc-800 flex justify-between text-[11px]">
                   <span class="text-zinc-400">Catálogo disponible</span>
                   <span class="font-bold font-mono text-zinc-100">25 productos</span>
@@ -373,6 +375,7 @@
                 <div class="p-3 bg-white border border-zinc-200 rounded-lg"><div id="inventory-count" class="text-xl font-bold">25</div><div class="text-[10px] text-zinc-500">Productos</div></div>
                 <div class="p-3 bg-white border border-zinc-200 rounded-lg"><div id="inventory-alert-count" class="text-xl font-bold text-rose-700">0</div><div class="text-[10px] text-zinc-500">Alertas de stock</div></div>
               </div>
+              <button onclick="createDemoProduct()" class="w-full min-h-11 mb-3 bg-zinc-900 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-2">＋ Registrar producto</button>
               <input id="inventory-search" oninput="renderInventory()" aria-label="Buscar producto en inventario" placeholder="Buscar producto o código" class="w-full p-3 text-xs border border-zinc-300 bg-white rounded-lg mb-2">
               <div class="flex gap-2 mb-3">
                 <button id="inventory-all" onclick="setInventoryFilter('all')" class="px-3 py-2 text-xs font-semibold rounded-lg bg-teal-50 border border-teal-700 text-teal-800">Todos</button>
@@ -390,7 +393,7 @@
                   <div class="text-xs font-bold text-zinc-900">Gestión de Ventas</div>
                   <div class="text-[10px] text-zinc-500">Trazabilidad e historial de comprobantes</div>
                 </div>
-                <span class="text-[9px] font-mono bg-teal-50 text-teal-800 border border-teal-200 px-2 py-0.5 rounded font-semibold">Inmutable</span>
+                <span class="text-[9px] font-mono bg-teal-50 text-teal-800 border border-teal-200 px-2 py-0.5 rounded font-semibold">Auditable</span>
               </div>
 
               <!-- Search input -->
@@ -523,12 +526,12 @@
               </div>
 
               <div class="flex gap-2 pt-1">
-                <button onclick="closeScanModal()" class="flex-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold py-2.5 rounded-xl text-xs transition">
-                  Cerrar
+                <button onclick="addScannedAndContinue()" class="flex-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold py-2.5 rounded-xl text-xs transition">
+                  Agregar y continuar
                 </button>
                 <button id="sm-add-btn" onclick="addScannedToCart()" class="flex-1 bg-zinc-900 hover:bg-black text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                  <span>+ Agregar</span>
+                  <span>Agregar e ir al carrito</span>
                 </button>
               </div>
             </div>
@@ -660,6 +663,7 @@
     let salesCount = 0;
     let revenue = 0;
     let selectedPay = 'EFECTIVO';
+    let editingSaleId = null;
     let filterCatActive = 'ALL';
     let searchQ = '';
 
@@ -947,8 +951,10 @@
       const p = products.find(x => x.id === id);
       if (!p) return;
       const ex = cart.find(x => x.id === id);
+      const originalQty = editingSaleId ? (salesHistory.find(s => s.id === editingSaleId)?.items.find(i => i.id === id)?.qty || 0) : 0;
+      const maxQty = p.stock + originalQty;
       if (ex) {
-        if (ex.qty >= p.stock) { showToast(`Stock máximo: ${p.stock}`); return; }
+        if (ex.qty >= maxQty) { showToast(`Máximo en la boleta: ${maxQty}`); return; }
         ex.qty++; ex.sub = +(ex.qty * ex.price).toFixed(2);
       } else {
         if (p.stock < 1) { showToast('Sin stock disponible'); return; }
@@ -964,7 +970,9 @@
       const p = products.find(x => x.id === id);
       const newQ = item.qty + d;
       if (newQ <= 0) { removeItem(id); return; }
-      if (newQ > p.stock) { showToast(`Stock disponible: ${p.stock}`); return; }
+      const originalQty = editingSaleId ? (salesHistory.find(s => s.id === editingSaleId)?.items.find(i => i.id === id)?.qty || 0) : 0;
+      const maxQty = p.stock + originalQty;
+      if (newQ > maxQty) { showToast(`Máximo en la boleta: ${maxQty}`); return; }
       item.qty = newQ;
       item.sub = +(newQ * item.price).toFixed(2);
       renderCart();
@@ -1054,6 +1062,13 @@
         addToCart(currentScannedProd.id);
         closeScanModal();
         navigateTab('cart');
+      }
+    }
+
+    function addScannedAndContinue() {
+      if (currentScannedProd) {
+        addToCart(currentScannedProd.id);
+        closeScanModal();
       }
     }
 
@@ -1337,9 +1352,9 @@
               <span>Registrar Devolución de Producto</span>
             </button>
 
-            <button onclick="startLinkedSale('${sale.id}')" class="w-full bg-white border border-zinc-300 hover:border-zinc-500 text-zinc-900 font-bold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1.5">
+            <button onclick="startSaleCorrection('${sale.id}')" class="w-full bg-white border border-zinc-300 hover:border-zinc-500 text-zinc-900 font-bold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1.5">
               <svg class="w-4 h-4 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-              <span>Agregar Producto (Venta Relacionada)</span>
+              <span>Corregir productos de esta boleta</span>
             </button>
 
             <button onclick="openAnnulModal('${sale.id}')" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
@@ -1512,10 +1527,18 @@
       openSaleDetail(sale.id);
     }
 
-    function startLinkedSale(saleId) {
+    function startSaleCorrection(saleId) {
       const sale = salesHistory.find(s => s.id === saleId);
-      showToast(`Iniciando venta vinculada a ${sale ? sale.number : ''}`);
-      navigateTab('search');
+      if (!sale) return;
+      editingSaleId = saleId;
+      cart = sale.items.map(item => {
+        const product = products.find(p => p.id === item.id);
+        return { id:item.id, code:item.code, name:item.name, price:item.price, qty:item.qty, sub:+(item.qty*item.price).toFixed(2), img:product?.img || '' };
+      });
+      selectedPay = sale.method;
+      renderCart();
+      showToast(`Corrigiendo ${sale.number}: se conservarán ID, cliente y comprobante`);
+      navigateTab('cart');
     }
 
     function navigateTab(tab) {
@@ -1587,6 +1610,21 @@
       `).join('') : '<div class="text-xs text-zinc-500 text-center py-5">No hay productos para este filtro.</div>';
     }
 
+    function createDemoProduct() {
+      const name = prompt('Nombre y presentación del producto');
+      if (!name || !name.trim()) return;
+      const code = prompt('Código de barras');
+      if (!code || !code.trim()) return;
+      if (products.some(p => p.code.toLowerCase() === code.trim().toLowerCase())) { showToast('Ese código ya está registrado'); return; }
+      const cat = prompt('Categoría', 'Primeros Auxilios') || 'Sin categoría';
+      const price = Number(prompt('Precio de venta', '1.00'));
+      const stock = Number(prompt('Stock inicial', '0'));
+      if (!(price > 0) || !Number.isInteger(stock) || stock < 0) { showToast('Precio o stock no válido'); return; }
+      products.push({ id: Math.max(...products.map(p => p.id)) + 1, cat:cat.trim(), code:code.trim(), name:name.trim(), price, stock, min:5, img:PRODUCT_IMAGE_FALLBACK });
+      renderInventory(); renderProductList(); renderQuickList();
+      showToast(`✓ Producto registrado: ${name.trim()}`);
+    }
+
     let toastTimer;
     function showToast(msg) {
       const t = document.getElementById('toast');
@@ -1608,6 +1646,36 @@
     const _originalConfirmSale = confirmSale;
     confirmSale = function() {
       if (!cart.length) return;
+      if (editingSaleId) {
+        const sale = salesHistory.find(s => s.id === editingSaleId);
+        if (!sale) { editingSaleId = null; return; }
+        for (const item of cart) {
+          const product = products.find(p => p.id === item.id);
+          const oldQty = sale.items.find(i => i.id === item.id)?.qty || 0;
+          if (!product || product.stock < item.qty - oldQty) { showToast(`Stock insuficiente: ${item.name}`); return; }
+        }
+        const oldTotal = sale.total;
+        const allIds = new Set([...sale.items.map(i => i.id), ...cart.map(i => i.id)]);
+        allIds.forEach(id => {
+          const product = products.find(p => p.id === id);
+          if (!product) return;
+          const oldQty = sale.items.find(i => i.id === id)?.qty || 0;
+          const newQty = cart.find(i => i.id === id)?.qty || 0;
+          product.stock -= newQty - oldQty;
+        });
+        sale.items = cart.map(item => ({ id:item.id, code:item.code, name:item.name, price:item.price, qty:item.qty, returnedQty:0, sub:item.sub }));
+        sale.total = cart.reduce((sum,item) => sum + item.sub, 0);
+        sale.subtotal = sale.total / 1.18;
+        sale.igv = sale.total - sale.subtotal;
+        sale.history.unshift({ event:'BOLETA_CORREGIDA', desc:`Productos corregidos sobre la misma boleta. Total anterior S/ ${oldTotal.toFixed(2)}; nuevo total S/ ${sale.total.toFixed(2)}.`, time:'Ahora' });
+        revenue += sale.total - oldTotal;
+        document.getElementById('m-code').textContent = sale.code;
+        document.getElementById('m-method').textContent = sale.method;
+        document.getElementById('m-total').textContent = `S/ ${sale.total.toFixed(2)}`;
+        document.getElementById('modal').classList.remove('hidden');
+        editingSaleId = null; cart = []; renderCart(); renderProductList(); renderQuickList(); updateKpis();
+        return;
+      }
       for (const item of cart) {
         const p = products.find(x => x.id === item.id);
         if (!p || p.stock < item.qty) { showToast(`Stock insuficiente: ${item.name}`); return; }

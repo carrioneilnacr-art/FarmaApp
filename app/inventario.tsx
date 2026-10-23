@@ -11,14 +11,18 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { inventoryRepository, InventorySnapshot, RecentStockMovement } from '../repositories/inventoryRepository';
 import { ProductoConCategoria } from '../types/database';
 import { estimateCoverageDays, getStockStatus } from '../utils/inventory';
 import { Colors } from '../theme/colors';
+import { useAuth } from '../context/AuthContext';
 
 type Filter = 'TODOS' | 'ALERTAS';
 
 export default function InventoryScreen() {
+  const router = useRouter();
+  const { role } = useAuth();
   const [snapshot, setSnapshot] = useState<InventorySnapshot | null>(null);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('TODOS');
@@ -142,6 +146,17 @@ export default function InventoryScreen() {
             <View><Text style={styles.summaryValue}>{snapshot?.products.length || 0}</Text><Text style={styles.meta}>Productos</Text></View>
             <View><Text style={[styles.summaryValue, styles.stockAlert]}>{alerts}</Text><Text style={styles.meta}>Alertas de stock</Text></View>
           </View>
+          {role === 'administrador' && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Registrar un producto nuevo"
+              onPress={() => router.push('/producto-nuevo')}
+              style={styles.addProductButton}
+            >
+              <Ionicons name="add-circle-outline" size={20} color={Colors.white} />
+              <Text style={styles.addProductText}>Registrar producto</Text>
+            </Pressable>
+          )}
           <TextInput
             accessibilityLabel="Buscar producto en inventario"
             value={query}
@@ -175,6 +190,8 @@ const styles = StyleSheet.create({
   subtitle: { color: Colors.textSecondary, fontSize: 14, marginTop: 4, marginBottom: 16 },
   summary: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: Colors.white, borderColor: Colors.cardBorder, borderWidth: 1, borderRadius: 8, padding: 16, marginBottom: 16 },
   summaryValue: { fontSize: 24, fontWeight: '700', color: Colors.text },
+  addProductButton: { minHeight: 48, marginBottom: 16, borderRadius: 8, backgroundColor: Colors.primaryDark, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 16 },
+  addProductText: { color: Colors.white, fontSize: 15, fontWeight: '700' },
   stockAlert: { color: Colors.error },
   search: { minHeight: 48, borderWidth: 1, borderColor: Colors.border, borderRadius: 8, backgroundColor: Colors.white, paddingHorizontal: 14, fontSize: 16, color: Colors.text },
   filters: { flexDirection: 'row', gap: 8, marginVertical: 16 },

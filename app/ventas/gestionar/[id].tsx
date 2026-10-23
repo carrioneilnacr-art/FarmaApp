@@ -119,20 +119,9 @@ export default function GestionarVentaScreen() {
     }
   };
 
-  const handleCreateLinkedSale = () => {
+  const handleCorrectSale = () => {
     if (!venta) return;
-    // Redirige al buscador de productos indicando que es una venta relacionada
-    Alert.alert(
-      'Agregar Producto a Operación',
-      `Se iniciará una nueva operación vinculada a la venta ${venta.numero_venta || venta.codigo_venta}. El comprobante original se mantendrá inalterado.`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Continuar',
-          onPress: () => router.push(`/buscar?origen_id=${venta.id}` as never),
-        },
-      ]
-    );
+    router.push(`/ventas/editar/${venta.id}` as never);
   };
 
   if (loading) {
@@ -191,9 +180,8 @@ export default function GestionarVentaScreen() {
             {venta.comprobante_serie}-{venta.comprobante_numero}).
           </Text>
           <Text style={styles.noticeRule}>
-            No es posible modificar o eliminar directamente el comprobante original. Toda corrección
-            se gestiona mediante devolución, anulación controlada u operación relacionada sin perder
-            la trazabilidad tributaria ni el inventario.
+            Puedes corregir los productos de esta misma boleta. Se conservarán su ID, número,
+            comprobante y datos del cliente; cada cambio quedará registrado y ajustará el inventario.
           </Text>
         </View>
 
@@ -220,19 +208,19 @@ export default function GestionarVentaScreen() {
               <Ionicons name="chevron-forward" size={18} color={Colors.textMuted} />
             </TouchableOpacity>
 
-            {/* Opción 2: Agregar Producto (Operación Vinculada) */}
+            {/* Opción 2: Corregir productos de la misma boleta */}
             <TouchableOpacity
               style={styles.optionRow}
-              onPress={handleCreateLinkedSale}
+              onPress={handleCorrectSale}
               activeOpacity={0.8}
             >
               <View style={[styles.optionIconBox, { backgroundColor: Colors.surfaceContainerLow }]}>
                 <Ionicons name="add-circle-outline" size={20} color={Colors.primary} />
               </View>
               <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Agregar Producto (Venta Vinculada)</Text>
+                <Text style={styles.optionTitle}>Corregir productos de esta boleta</Text>
                 <Text style={styles.optionSubtitle}>
-                  El cliente olvidó un medicamento. Se genera una nueva operación vinculada manteniendo la original.
+                  Agrega, quita o cambia cantidades conservando el mismo número, cliente e ID de venta.
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={Colors.textMuted} />

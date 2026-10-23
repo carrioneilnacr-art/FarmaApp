@@ -65,6 +65,22 @@ export default function HomeScreen() {
             </View>
           </View>
 
+          <View style={styles.profileBar}>
+            <View style={styles.profileIdentity}>
+              <View style={styles.profileIcon}>
+                <Ionicons name={role === 'administrador' ? 'shield-checkmark' : 'person'} size={18} color={Colors.primaryDark} />
+              </View>
+              <View>
+                <Text style={styles.profileEyebrow}>PERFIL ACTIVO</Text>
+                <Text style={styles.profileName}>{role === 'administrador' ? 'Administrador' : 'Trabajador'}</Text>
+              </View>
+            </View>
+            <TouchableOpacity onPress={signOut} accessibilityRole="button" accessibilityLabel="Cerrar sesión" style={styles.signOutButton}>
+              <Ionicons name="log-out-outline" size={18} color={Colors.white} />
+              <Text style={styles.signOutText}>Salir</Text>
+            </TouchableOpacity>
+          </View>
+
           {/* Resumen en tiempo real del carrito actual */}
           <View style={styles.cartSummaryCard}>
             <View style={styles.cartSummaryItem}>
@@ -83,7 +99,6 @@ export default function HomeScreen() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
           <Text style={styles.sectionSubtitle}>Selecciona una operación</Text>
-          <TouchableOpacity onPress={signOut} accessibilityRole="button" accessibilityLabel="Cerrar sesión"><Text style={{ color: Colors.secondary, fontWeight: '700', marginTop: 8 }}>Cerrar sesión · {role}</Text></TouchableOpacity>
         </View>
 
         <View style={styles.actionGrid}>
@@ -212,8 +227,8 @@ export default function HomeScreen() {
         <View style={styles.infoBox}>
           <Ionicons name="shield-checkmark-outline" size={20} color={Colors.secondary} />
           <Text style={styles.infoBoxText}>
-            Trazabilidad garantizada: Las ventas emitidas son inmutables. Toda corrección se efectúa
-            mediante devolución atómica o anulación controlada con registro en Kardex.
+            Las correcciones conservan el mismo ID y número de boleta. Los cambios de productos,
+            devoluciones y anulaciones quedan registrados y actualizan el Kardex.
           </Text>
         </View>
       </ScrollView>
@@ -267,6 +282,25 @@ const styles = StyleSheet.create({
     color: Colors.primaryLight,
     marginTop: 2,
   },
+  profileBar: {
+    minHeight: 56,
+    marginBottom: 14,
+    paddingLeft: 12,
+    paddingRight: 8,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.22)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  profileIdentity: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  profileIcon: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.white },
+  profileEyebrow: { color: Colors.primaryLight, fontSize: 10, fontWeight: '700', letterSpacing: 0.8 },
+  profileName: { color: Colors.white, fontSize: 15, fontWeight: '800', marginTop: 1 },
+  signOutButton: { minHeight: 44, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 5, borderRadius: 10 },
+  signOutText: { color: Colors.white, fontSize: 13, fontWeight: '700' },
   cartSummaryCard: {
     flexDirection: 'row',
     backgroundColor: Colors.white,

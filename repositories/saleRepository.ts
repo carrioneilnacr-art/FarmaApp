@@ -10,6 +10,7 @@ import {
   AnularVentaResponse,
   VentaCompleta,
   ResumenDiario,
+  CorregirVentaResponse,
   TipoIncidencia,
   EstadoVenta,
 } from '../types/database';
@@ -23,6 +24,20 @@ export interface ProcessSaleParams {
 }
 
 export const saleRepository = {
+  async correctSale(
+    ventaId: string,
+    items: { producto_id: string; cantidad: number }[],
+    motivo: string
+  ): Promise<CorregirVentaResponse> {
+    if (!items.length) throw new Error('La boleta debe conservar al menos un producto. Para cancelarla usa Anular venta.');
+    const { data, error } = await supabase.rpc('corregir_venta_atomica', {
+      p_venta_id: ventaId,
+      p_items: items as unknown as import('../types/database').Json,
+      p_motivo: motivo.trim() || 'Corrección solicitada por el cliente',
+    } as never);
+    if (error) throw new Error(error.message || 'No se pudo corregir la boleta');
+    return data as unknown as CorregirVentaResponse;
+  },
   /**
    * Procesa y registra una venta atómica a través del RPC de Supabase / PostgreSQL.
    */
